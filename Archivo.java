@@ -138,13 +138,8 @@ public class Archivo {
 			archi.add(new Paragraph("posicion de este texto 2"));
 			
 			archi.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (DocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (FileNotFoundException e) {e.printStackTrace();}
+		  catch (DocumentException e) {e.printStackTrace();}
 	}
 
 }
