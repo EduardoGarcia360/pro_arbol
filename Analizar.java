@@ -213,8 +213,18 @@ public class Analizar {
 		return correcto;
 	}
 	
+	private boolean esnumero(String dato){
+        try{
+            Integer.parseInt(dato);
+        }catch(NumberFormatException nfe){
+            return false;
+        }
+        return true;
+    }
+	
 	private void Metodo_Variables(LinkedList<String> Variables){
 		LinkedList<String> temporal = new LinkedList<String>();
+		LinkedList<String> ListadeVariables = new LinkedList<String>();
 		String tmp ="";
 		for(int i=2; i<Variables.size()-1; i++){
 			tmp += Variables.get(i).toString();
@@ -227,8 +237,36 @@ public class Analizar {
 		System.out.println("de lista temporal");
 		for(int h=0; h<temporal.size(); h++){
 			String linea = temporal.get(h).toString() + ";";
-			System.out.println();
-			System.out.println("posicion "+h +" - "+ linea);
+			ListadeVariables.add(linea);
+		}
+		
+		for(int p=0; p<ListadeVariables.size(); p++){
+			String Token = ListadeVariables.get(p);
+			char[] aChartmp = Token.toCharArray();
+			int c=0;
+			char ca=0;
+			String LineaVariables="";
+			for(int w=0; w<aChartmp.length; w++){
+				ca = aChartmp[w];
+				if(ca == ':' || ca == '=' || ca == ';'){
+					c++;
+					LineaVariables += Character.toString(aChartmp[w]);
+				}else{
+					LineaVariables += Character.toString(aChartmp[w]);
+				}
+			}
+			
+			if(c == 3){
+				//SI CUMPLE CON LAS CONDICIONES
+				String[] arreglo1 = LineaVariables.split(":");
+				String ae = arreglo1[1];
+				String[] arreglo2 = ae.split("=");
+				System.out.println("pos 0"+ arreglo1[0]);
+				System.out.println("pos 1"+ arreglo2[0]);
+				System.out.println("pos 2"+ arreglo2[1]);
+			}else{
+				//LE FALTA : O = O ;
+			}
 		}
 	}
 
