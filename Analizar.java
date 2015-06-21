@@ -25,29 +25,29 @@ public class Analizar {
 					paraEncabezado.add(TokensSeparar[j]);
 					j++;
 				}
+				
 				cambio = true;
 				EncabezadoActivado = true;
 			}else if( TokensSeparar[i].equals("VARIABLES")){
+				
 				int j=i;
-				do{
+				
+				while(j != TokensSeparar.length){
 					paraVariables.add(TokensSeparar[j]);
 					j++;
-					
-				}while( j != TokensSeparar.length);
+				}
+				
 				cambio = true;
-				VariablesActivado = false;
+				VariablesActivado = true;
 			}
 		}
 		if( cambio == true ){
-			if( EncabezadoActivado == true){
-				VerificarEncabezado(paraEncabezado);
-			}else{
-				//DEFAULT
-			}
+			
 			if( VariablesActivado == true ){
 				VerificarVariables(paraVariables);
-			}else{
-				//DEFAULT
+			}
+			if( EncabezadoActivado == true){
+				VerificarEncabezado(paraEncabezado);
 			}
 		}else{
 			JOptionPane.showMessageDialog(null, "error");
@@ -100,7 +100,7 @@ public class Analizar {
 			System.out.println("en variable falta una llave");
 		}else{
 			System.out.println("en variable texto correcto");
-			//METODO PARA MANDAR LOS DATOS A LA ETIQUETA EN LA CLASE ARCHIVO.
+			Metodo_Variables(ListadeVariables);
 		}
 	}
 	
@@ -155,6 +155,8 @@ public class Analizar {
 								for(int txt=1; txt<f-1; txt++){
 									texto += Character.toString(textoentrecomillas[txt]);
 								}
+								String[] algo = texto.split("%");
+								System.out.println("de arreglo algo "+ algo[0]);
 								System.out.println("lo que esta en comillas es " + texto);
 							}else{
 								//NO TIENE COMILLAS
@@ -209,6 +211,25 @@ public class Analizar {
 			}
 		}
 		return correcto;
+	}
+	
+	private void Metodo_Variables(LinkedList<String> Variables){
+		LinkedList<String> temporal = new LinkedList<String>();
+		String tmp ="";
+		for(int i=2; i<Variables.size()-1; i++){
+			tmp += Variables.get(i).toString();
+		}
+		
+		String[] auno = tmp.split(";");
+		for(int j=0; j<auno.length; j++){
+			temporal.add(auno[j]);
+		}
+		System.out.println("de lista temporal");
+		for(int h=0; h<temporal.size(); h++){
+			String linea = temporal.get(h).toString() + ";";
+			System.out.println();
+			System.out.println("posicion "+h +" - "+ linea);
+		}
 	}
 
 }
