@@ -225,7 +225,13 @@ public class Analizar {
 	private void Metodo_Variables(LinkedList<String> Variables){
 		LinkedList<String> temporal = new LinkedList<String>();
 		LinkedList<String> ListadeVariables = new LinkedList<String>();
+		
+		LinkedList<String> L1 = new LinkedList<String>();
+		LinkedList<String> L3 = new LinkedList<String>();
+		
 		String tmp ="";
+		
+		//DIVIDIMOS USANDO ; POR SI HAY VARIOS EN LA MISMA LINEA
 		for(int i=2; i<Variables.size()-1; i++){
 			tmp += Variables.get(i).toString();
 		}
@@ -234,6 +240,7 @@ public class Analizar {
 		for(int j=0; j<auno.length; j++){
 			temporal.add(auno[j]);
 		}
+		//A LA LISTA TEMPORAL LE AGREGAMOS ; AL FINAL A CADA ITERACION PARA SU POSTERIOR CONTEO
 		System.out.println("de lista temporal");
 		for(int h=0; h<temporal.size(); h++){
 			String linea = temporal.get(h).toString() + ";";
@@ -248,7 +255,7 @@ public class Analizar {
 			String LineaVariables="";
 			for(int w=0; w<aChartmp.length; w++){
 				ca = aChartmp[w];
-				if(ca == ':' || ca == '=' || ca == ';'){
+				if(ca == ':' || ca == '=' || ca == ';'){ //SI TIENE : Y = Y ; ENTONCES TIENE UNA CORRECTA ESCRITURA DE LA SENTENCIA.
 					c++;
 					LineaVariables += Character.toString(aChartmp[w]);
 				}else{
@@ -257,16 +264,41 @@ public class Analizar {
 			}
 			
 			if(c == 3){
+				
 				//SI CUMPLE CON LAS CONDICIONES
-				String[] arreglo1 = LineaVariables.split(":");
-				String ae = arreglo1[1];
-				String[] arreglo2 = ae.split("=");
-				System.out.println("pos 0"+ arreglo1[0]);
-				System.out.println("pos 1"+ arreglo2[0]);
-				System.out.println("pos 2"+ arreglo2[1]);
+				String[] Arreglo_TodasVariables = LineaVariables.split(":"); //ESTAN X1,X2,X3...
+				String aee = Arreglo_TodasVariables[0];
+				String[] Arreglo_SeparadasVariables = aee.split(",");//ESTAN [X1][X2][X3]....
+				String ae = Arreglo_TodasVariables[1];
+				String[] Arreglo_Tipo_Valor = ae.split("=");// ESTAN CADENA/ENTERO Y TEXTO/VALOR
+				
+				String v = Arreglo_Tipo_Valor[1];
+				char x =0;
+				char[] av = v.toCharArray();
+				String valor="";
+				for(int ww=0; ww<v.length(); ww++){
+					x = av[ww];
+					if(x != ' '){
+						valor += Character.toString(av[ww]);
+					}
+				}
+				
+				for(int pos=0; pos<Arreglo_SeparadasVariables.length; pos++){
+					String variable = Arreglo_SeparadasVariables[pos];
+					L1.add(variable);
+					L3.add(valor);
+				}
+				
+				
 			}else{
 				//LE FALTA : O = O ;
 			}
+		}//FIN FOR
+		//MOSTRANDO
+		System.out.println("mostrando resultado de L1 Y L3----- linea-------- ");
+		for(int po=0; po<L1.size(); po++){
+			System.out.println();
+			System.out.println("a ->"+ L1.get(po) + "<- corresponde ->" + L3.get(po)+"<-");
 		}
 	}
 
