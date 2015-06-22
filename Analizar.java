@@ -14,6 +14,7 @@ public class Analizar {
 	public void Separar(String Datos){
 		LinkedList<String> paraEncabezado = new LinkedList<String>();
 		LinkedList<String> paraVariables = new LinkedList<String>();
+		LinkedList<String> paraArbol = new LinkedList<String>();
 		String[] TokensSeparar = Datos.split("\n");
 		boolean cambio=false;
 		for(int i=0; i<TokensSeparar.length; i++){
@@ -32,23 +33,34 @@ public class Analizar {
 				
 				int j=i;
 				
-				while(j != TokensSeparar.length){
+				while(!TokensSeparar[j].equals("ARBOL")){ //j != TokensSeparar.length
 					paraVariables.add(TokensSeparar[j]);
 					j++;
 				}
 				
 				cambio = true;
 				VariablesActivado = true;
+			}else if( TokensSeparar[i].equals("ARBOL")){
+				int j=i;
+				while(j != TokensSeparar.length){
+					paraArbol.add(TokensSeparar[j]);
+					j++;
+				}
+				cambio = true;
+				ArbolActivado = true;
 			}
-		}
+		}//FIN FOR
 		if( cambio == true ){
-			
-			if( VariablesActivado == true ){
-				VerificarVariables(paraVariables);
-			}
 			if( EncabezadoActivado == true){
 				VerificarEncabezado(paraEncabezado);
 			}
+			if( VariablesActivado == true ){
+				VerificarVariables(paraVariables);
+			}
+			if( ArbolActivado == true ){
+				VerificarArbol(paraArbol);
+			}
+			
 		}else{
 			JOptionPane.showMessageDialog(null, "error");
 		}
@@ -104,6 +116,27 @@ public class Analizar {
 		}
 	}
 	
+	private void VerificarArbol(LinkedList<String> ListadeArbol){
+		String Linea = "";
+		for(int h=0; h<ListadeArbol.size(); h++){
+			Linea += ListadeArbol.get(h);
+		}
+		int c=0;
+		char caracter = 0;
+		for(int i=0; i<Linea.length(); i++){
+			caracter = Linea.charAt(i);
+			if( caracter == '{' || caracter == '}'){
+				c++;
+			}
+		}
+		
+		if( c!= 2){
+			//FALTA UNA LLAVE
+		}else{
+			
+		}
+	}
+	
 	private void Metodo_Encabezado(LinkedList<String> Encabezado){
 		String texto="";
 		for(int i=2; i<Encabezado.size()-2; i++){
@@ -147,7 +180,7 @@ public class Analizar {
 						}
 						if( c==1 ){
 							String datos = Tokens[1].substring(0, Tokens[1].length()-2);
-							System.out.println("datos: "+datos);
+							
 							char[] textoentrecomillas = datos.toCharArray();
 							int f = textoentrecomillas.length;
 							//String texto="";
@@ -300,6 +333,10 @@ public class Analizar {
 			System.out.println();
 			System.out.println("a ->"+ L1.get(po) + "<- corresponde ->" + L3.get(po)+"<-");
 		}
+	}
+	
+	private void Metodo_Arbol(LinkedList<String> Arbol){
+		
 	}
 
 }
