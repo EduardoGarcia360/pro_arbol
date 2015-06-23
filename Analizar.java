@@ -8,15 +8,17 @@ import javax.swing.JOptionPane;
 
 public class Analizar {
 	
-	boolean EncabezadoActivado = false, VariablesActivado = false, ArbolActivado = false;
 	
+	LinkedList<String> L1 = new LinkedList<String>();
+	LinkedList<String> L3 = new LinkedList<String>();
 	
 	public void Separar(String Datos){
+		boolean EncabezadoActivado = false, VariablesActivado = false, ArbolActivado = false, cambio=false;
 		LinkedList<String> paraEncabezado = new LinkedList<String>();
 		LinkedList<String> paraVariables = new LinkedList<String>();
 		LinkedList<String> paraArbol = new LinkedList<String>();
 		String[] TokensSeparar = Datos.split("\n");
-		boolean cambio=false;
+		
 		for(int i=0; i<TokensSeparar.length; i++){
 			
 			if( TokensSeparar[i].equals("ENCABEZADO")){
@@ -121,19 +123,25 @@ public class Analizar {
 		for(int h=0; h<ListadeArbol.size(); h++){
 			Linea += ListadeArbol.get(h);
 		}
+		//Linea += "}";
 		int c=0;
+		int c2=0;
 		char caracter = 0;
 		for(int i=0; i<Linea.length(); i++){
 			caracter = Linea.charAt(i);
-			if( caracter == '{' || caracter == '}'){
+			if( caracter == '{'){
 				c++;
+			}else if( caracter == '}'){
+				c2++;
 			}
 		}
 		
-		if( c!= 2){
-			//FALTA UNA LLAVE
-		}else{
+		if( c == c2){
+			Metodo_Arbol(ListadeArbol);
 			
+		}else{
+			//FALTA UNA LLAVE
+			System.out.println("falta una llave arbol");
 		}
 	}
 	
@@ -259,9 +267,6 @@ public class Analizar {
 		LinkedList<String> temporal = new LinkedList<String>();
 		LinkedList<String> ListadeVariables = new LinkedList<String>();
 		
-		LinkedList<String> L1 = new LinkedList<String>();
-		LinkedList<String> L3 = new LinkedList<String>();
-		
 		String tmp ="";
 		
 		//DIVIDIMOS USANDO ; POR SI HAY VARIOS EN LA MISMA LINEA
@@ -336,7 +341,50 @@ public class Analizar {
 	}
 	
 	private void Metodo_Arbol(LinkedList<String> Arbol){
+		boolean ParentescoActivado = false, PersonaActivado = false, cambio = false;
+		LinkedList<String> paraParentesco = new LinkedList<String>();
+		LinkedList<String> paraPersona = new LinkedList<String>();
+		int u = Arbol.size();
+		if( Arbol.get(1).toString().equals("{") || Arbol.get(u).toString().equals("}") ){
+			for(int i=2; i<Arbol.size()-1; i++){
+				if(Arbol.get(i).toString().equals("Persona:{")){
+					int f=i;
+					while( !Arbol.get(f).equals("Relacion:{") ){
+						paraPersona.add(Arbol.get(f));
+						f++;
+					}
+					PersonaActivado=true;
+					cambio=true;
+					i += (f-3);
+					System.out.println("se quedo en " + Arbol.get(i));
+				}else if( Arbol.get(i).toString().equals("Relacion:{")){
+					System.out.println("entro en relacion");
+					int f=i;
+					while(f != Arbol.size()-1){
+						paraParentesco.add(Arbol.get(f));
+						f++;
+					}
+					ParentescoActivado=true;
+					cambio=true;
+					i += f;
+				}
+			}//FIN FOR
+			if(cambio == true){
+				if(PersonaActivado == true && ParentescoActivado == true){
+					
+				}else{
+					//NO PUEDE HABER PERSONA SIN PARENTESCO Y PARENTESCO SIN PERSONA
+				}
+			}else{
+				//NO INGRESO NADA EN ARBOL
+			}
+			
+		}else{
+			//FALTA { O } ERROR
+			System.out.println("falta { o } error");
+		}
 		
+		System.out.println("de lista l1 " + L1.getFirst());
 	}
 
 }
