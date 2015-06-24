@@ -316,7 +316,7 @@ public class Analizar {
 				String valor="";
 				for(int ww=0; ww<v.length(); ww++){
 					x = av[ww];
-					if(x != ' '){
+					if(x != ' ' && x != ';' && x != '"'){
 						valor += Character.toString(av[ww]);
 					}
 				}
@@ -401,24 +401,81 @@ public class Analizar {
 			
 			if( Linea_Codigo.equals("Persona:{")){
 				if( Linea_Simbolo.equals("}") ){
-					System.out.println("------------------------------");
-					for(int h=(i); h<=(i+4); h++){
+					for(int h=(i+1); h<=(i+4); h++){
 						String Linea = QuitarEspacios(Persona.get(h));
-						System.out.println();
-						System.out.println("de quitar espacios "+Linea);
 						
 						String[] Arreglo_Linea = Linea.split(":");
+						System.out.println("en posicion 0: " + Arreglo_Linea[0]);
 						if(Arreglo_Linea.length == 2){
-							if(Arreglo_Linea[0].equals("id")){
-								System.out.println("si hay id ");
+							if(Arreglo_Linea[0].equals("id")){ //-------------------------------------------- ID
 								
-							}else if(Arreglo_Linea[0].equals("nombre")){
-								System.out.println("si hay nombre ");
+								String D_id = Arreglo_Linea[1];
+								String Datos_id = QuitarEspacios(D_id);
 								
-							}else if(Arreglo_Linea[0].equals("edad")){
-								System.out.println("si hay edad");
+								if(Buscar_L1(Datos_id) == true){
+									int posicion = Obtener_PosicionL1(Datos_id);
+									String valor = Retornar_L3(posicion);
+									Valores += valor +"%";
+								}else if(esnumero(Datos_id) == true){
+									Valores += Datos_id + "%";
+								}else{
+									//INGRESA UN NUMERO O VARIABLE NUMERICA
+								}
 								
-							}else if(Arreglo_Linea[0].equals("parentesco")){
+							}else if(Arreglo_Linea[0].equals("nombre")){ //-------------------------------------------- NOMBRE
+								if(EstructuraCorrecta(Linea) == true){
+									//QUITANDO PUNTO Y COMA DE POSICION 1
+									String tmp = Arreglo_Linea[1];
+									String Dato_valor = tmp.substring(0, tmp.length()-1);
+									
+									if(Buscar_L1(Dato_valor) == true){
+										int posicion = Obtener_PosicionL1(Dato_valor);
+										String valor = Retornar_L3(posicion);
+										
+										if(esnumero(Dato_valor) == false){
+											Valores += valor + "%";
+										}else{
+											//INGRESA UNA VARIABLE TIPO CADENA
+										}
+									}else if(esnumero(Dato_valor) == false){
+										if(TieneComillas(Dato_valor) == true){
+											String valor = QuitarComillas(Dato_valor);
+											Valores += valor + "%";
+										}else{
+											//LOS NOMBRES VAN ENTRE COMILLAS
+										}
+									}else{
+										//VERIFICA LO INGRESADO EN NOMBRE
+									}
+									
+								}else{
+									//NO TIENE DOS PUNTOS O PUNTO Y COMA
+								}
+							}else if(Arreglo_Linea[0].equals("edad")){ //-------------------------------------------- EDAD
+								if(EstructuraCorrecta(Linea) == true){
+									String tmp = Arreglo_Linea[1];
+									String Dato_edad = tmp.substring(0, tmp.length()-1);
+									
+									if(Buscar_L1(Dato_edad) == true){
+										int posicion = Obtener_PosicionL1(Dato_edad);
+										String valor = Retornar_L3(posicion);
+										
+										if(esnumero(valor) == true){
+											Valores += valor + "%";
+										}else{
+											//INGRESA UNA VARIABLE TIPO ENTERO
+										}
+									}else if(esnumero(Dato_edad) == true){
+										Valores += Dato_edad + "%";
+									}else{
+										//VERIFICA LO INGRESADO EN EDAD
+									}
+									
+								}else{
+									//FALTA DOS PUNTOS O PUNTO Y COMA
+								}
+								
+							}else if(Arreglo_Linea[0].equals("parentesco")){ //-------------------------------------------- PARENTESCO
 								System.out.println("si hay parentesco ");
 								
 							}else{
@@ -442,7 +499,7 @@ public class Analizar {
 			}
 			
 		}//FIN FOR
-		
+		System.out.println(Valores);
 		
 	}
 	
@@ -468,12 +525,24 @@ public class Analizar {
 	
 	private boolean TieneComillas(String linea){
 		char [] a = linea.toCharArray();
-		int f = a.length;
+		int f = a.length-1;
 		if(a[0] == '"' && a[f] == '"'){
 			return true;
 		}else{
 			return false;
 		}
+	}
+	
+	private String QuitarComillas(String linea){
+		char caracter = 0;
+		String retornar="";
+		for(int i=0; i<linea.length(); i++){
+			caracter = linea.charAt(i);
+			if(caracter != '"'){
+				retornar += Character.toString(caracter);
+			}
+		}
+		return retornar;
 	}
 	
 	private String QuitarEspacios(String linea){
@@ -488,7 +557,7 @@ public class Analizar {
 		return retorno;
 	}
 	
-	private boolean Estructura_Correcta(String linea){
+	private boolean EstructuraCorrecta(String linea){
 		int c=0;
 		char caracter=0;
 		
@@ -507,27 +576,34 @@ public class Analizar {
 	
 	private boolean Buscar_L1(String variable){
 		boolean encontrado=false;
-		while(true){
-			int pos=0;
-			if( L1.get(pos).toString().equals(variable) ){
-				encontrado = true;
-				break;
-			}else{
-				pos++;
+		int pos=0;
+		
+		try{
+			for(int i = 0; i<L1.size(); i++){
+				String Linea = L1.get(i).toString();
+				if(Linea.equals(variable)){
+					encontrado = true;
+				}
 			}
+		}catch(Exception e){
+			System.out.println("bug en buscar l1");
 		}
+		
 		
 		return encontrado;
 	}
 	
-	private int Obtener_PosL1(String variable){
+	private int Obtener_PosicionL1(String variable){
 		int posicion=0;
-		while(true){
-			if( L1.get(posicion).toString().equals(variable)){
-				break;
-			}else{
-				posicion++;
+		try{
+			for(int i =0; i<L1.size(); i++){
+				String Linea = L1.get(i).toString();
+				if(Linea.equals(variable)){
+					posicion = i;
+				}
 			}
+		}catch(Exception e){
+			System.out.println("bug en obtener pos l1");
 		}
 		return posicion;
 	}
