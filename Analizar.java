@@ -9,8 +9,8 @@ import javax.swing.JOptionPane;
 public class Analizar {
 	
 	
-	LinkedList<String> L1 = new LinkedList<String>();
-	LinkedList<String> L3 = new LinkedList<String>();
+	public LinkedList<String> L1 = new LinkedList<String>();
+	public LinkedList<String> L3 = new LinkedList<String>();
 	
 	public void Separar(String Datos){
 		boolean EncabezadoActivado = false, VariablesActivado = false, ArbolActivado = false, cambio=false;
@@ -356,9 +356,9 @@ public class Analizar {
 					PersonaActivado=true;
 					cambio=true;
 					i += (f-3);
-					System.out.println("se quedo en " + Arbol.get(i));
+					
 				}else if( Arbol.get(i).toString().equals("Relacion:{")){
-					System.out.println("entro en relacion");
+					
 					int f=i;
 					while(f != Arbol.size()-1){
 						paraParentesco.add(Arbol.get(f));
@@ -371,7 +371,7 @@ public class Analizar {
 			}//FIN FOR
 			if(cambio == true){
 				if(PersonaActivado == true){
-					System.out.println("entro en persona activado");
+					
 					Metodo_Persona(paraPersona);
 				}else{
 					//NO PUEDE HABER PERSONA SIN PARENTESCO Y PARENTESCO SIN PERSONA
@@ -389,103 +389,60 @@ public class Analizar {
 	}
 	
 	private void Metodo_Persona(LinkedList<String> Persona){
+		
 		String Valores="";
 		for(int i=0; i<Persona.size(); i++){
-			if( Persona.get(i).toString().equals("Persona:{")){
-				if( Persona.get(i+5).toString().equals("}") ){
-					if(Estructura_Correcta(Persona.get(i+1).toString())){
-						String nuevalinea = QuitarEspacios(Persona.get(i+1).toString());
-						String[] Arreglo_ID = nuevalinea.toString().split(":");
-						if(Arreglo_ID[0].equals("id")){
-							if( esnumero(Arreglo_ID[1]) == true ){ //SÍ ES UN NUMERO
-								//NUEVO ID
-								Valores += Arreglo_ID[1] + "%";
-							}else if( Buscar_L1(Arreglo_ID[1]) == true){
-								Valores += Retornar_L3(Obtener_PosL1(Arreglo_ID[1])) + "%";
+			
+			String Linea_Codigo = Persona.get(i).toString();
+			System.out.println("esta en pos "+i +"<->"+Linea_Codigo);
+			String Linea_Simbolo = Persona.get(i+5).toString();
+			int pos = i + 5;
+			System.out.println("simbolo "+pos +"<->"+Linea_Simbolo);
+			
+			if( Linea_Codigo.equals("Persona:{")){
+				if( Linea_Simbolo.equals("}") ){
+					System.out.println("------------------------------");
+					for(int h=(i); h<=(i+4); h++){
+						String Linea = QuitarEspacios(Persona.get(h));
+						System.out.println();
+						System.out.println("de quitar espacios "+Linea);
+						
+						String[] Arreglo_Linea = Linea.split(":");
+						if(Arreglo_Linea.length == 2){
+							if(Arreglo_Linea[0].equals("id")){
+								System.out.println("si hay id ");
+								
+							}else if(Arreglo_Linea[0].equals("nombre")){
+								System.out.println("si hay nombre ");
+								
+							}else if(Arreglo_Linea[0].equals("edad")){
+								System.out.println("si hay edad");
+								
+							}else if(Arreglo_Linea[0].equals("parentesco")){
+								System.out.println("si hay parentesco ");
+								
 							}else{
-								//NO ES VARIABLE Y NO ES NUMERO ERROR
+								//NO ES PALABRA RESERVADA
+								System.out.println("nada bueno ");
 							}
 						}else{
-							//NO ES PALABRA RESERVADA
+							//NO INCLUYO DOS PUNTOS
+							System.out.println("no incluyo dos puntos ");
 						}
-					}else{
-						//FALTA UN SIMBOLO
-					}//FIN PARA ID
-					
-					if(Estructura_Correcta(Persona.get(i+2).toString())){
-						String l = Persona.get(i+2).toString();
-						String nuevalinea = l.substring(0, l.length()-1);
-						String[] Arreglo_NOMBRE = nuevalinea.split(":");
-						if(Arreglo_NOMBRE[0].equals("nombre")){
-							if( esnumero(Arreglo_NOMBRE[1]) == false){
-								String linea = QuitarEspacios(Arreglo_NOMBRE[1]);
-								if( Buscar_L1(linea) == true){
-									Valores += Retornar_L3(Obtener_PosL1(Arreglo_NOMBRE[1])) + "%";
-								}else if( TieneComillas(linea) == true){
-									String tmp="";
-									char[] texto = Arreglo_NOMBRE[1].toCharArray();
-									for(int t=0; t<texto.length; t++){
-										if(texto[t] != '"'){
-											tmp += Character.toString(texto[t]);
-										}
-									}
-									Valores += tmp + "%";
-								}else{
-									//LOS VALORES VAN ENTRE COMILLAS O USA UNA VARIABLE
-								}
-							}else{
-								//NO PUEDES INGRESAR NUMEROS 
-							}
-						}else{
-							//NO ES PALABRA RESERVADA
-						}
-					}else{
-						//FALTA UN SIMBOLO
-					}//FIN PARA NOMBRE
-					
-					if(Estructura_Correcta(Persona.get(i+3).toString())){
-						String l = Persona.get(i+3).toString();
-						String nuevalinea = l.substring(0, l.length()-1);
-						String[] Arreglo_EDAD = nuevalinea.split(":");
-						if( Arreglo_EDAD[0].equals("edad")){
-							String valor = QuitarEspacios(Arreglo_EDAD[1]);
-							if( esnumero(valor) == true){
-								//EDAD ESCRITA
-								Valores += valor + "%";
-							}else if(Buscar_L1(valor) == true){
-								Valores += Retornar_L3(Obtener_PosL1(valor)) + "%";
-							}else{
-								//NO HAS INGRESADO UNA EDAD VALIDA
-							}
-						}else{
-							//NO ES PALABRA RESERVADA
-						}
-					}else{
-						//FALTA UN SIMBOLO
-					}//FIN PARA EDAD
-					
-					if(Estructura_Correcta(Persona.get(i+4).toString())){
-						String l = Persona.get(i+4).toString();
-						String nuevalinea = l.substring(0, l.length()-1);
-						String[] Arreglo_PAREN = nuevalinea.split(":");
-						if( Arreglo_PAREN[0].equals("parentesco")){
-							String valor = QuitarEspacios(Arreglo_PAREN[1]);
-							String[] Parentescos = valor.split(",");
-							
-						}else{
-							//NO ES PALABRA RESERVADA
-						}
-					}else{
-						//FALTA UN SIMBOLO
-					}//FIN PARA PARENTESCO
-					
+					}//FIN FOR
+					System.out.println("----------------fin del for-----------------");
+					i = i +5;
 				}else{
 					//NO LO CERRO ENTRE '}'
+					System.out.println("error no cerro entre");
 				}
 			}else{
+				System.out.println("error inis per");
 				//ERROR EN INICIALIZAR PERSONA
 			}
-		}
+			
+		}//FIN FOR
+		
 		
 	}
 	
