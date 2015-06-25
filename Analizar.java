@@ -11,6 +11,9 @@ public class Analizar {
 	
 	public LinkedList<String> L1 = new LinkedList<String>();
 	public LinkedList<String> L3 = new LinkedList<String>();
+	public LinkedList<String> D1 = new LinkedList<String>();
+	public LinkedList<String> D2 = new LinkedList<String>();
+	public LinkedList<String> D3 = new LinkedList<String>();
 	
 	public void Separar(String Datos){
 		boolean EncabezadoActivado = false, VariablesActivado = false, ArbolActivado = false, cambio=false;
@@ -370,9 +373,9 @@ public class Analizar {
 				}
 			}//FIN FOR
 			if(cambio == true){
-				if(PersonaActivado == true){
-					
+				if(PersonaActivado == true && ParentescoActivado == true){
 					Metodo_Persona(paraPersona);
+					Metodo_Relacion(paraParentesco);
 				}else{
 					//NO PUEDE HABER PERSONA SIN PARENTESCO Y PARENTESCO SIN PERSONA
 				}
@@ -394,10 +397,7 @@ public class Analizar {
 		for(int i=0; i<Persona.size(); i++){
 			
 			String Linea_Codigo = Persona.get(i).toString();
-			System.out.println("esta en pos "+i +"<->"+Linea_Codigo);
 			String Linea_Simbolo = Persona.get(i+5).toString();
-			int pos = i + 5;
-			System.out.println("simbolo "+pos +"<->"+Linea_Simbolo);
 			
 			if( Linea_Codigo.equals("Persona:{")){
 				if( Linea_Simbolo.equals("}") ){
@@ -405,7 +405,6 @@ public class Analizar {
 						String Linea = QuitarEspacios(Persona.get(h));
 						
 						String[] Arreglo_Linea = Linea.split(":");
-						System.out.println("en posicion 0: " + Arreglo_Linea[0]);
 						if(Arreglo_Linea.length == 2){
 							if(Arreglo_Linea[0].equals("id")){ //-------------------------------------------- ID
 								
@@ -415,9 +414,17 @@ public class Analizar {
 								if(Buscar_L1(Datos_id) == true){
 									int posicion = Obtener_PosicionL1(Datos_id);
 									String valor = Retornar_L3(posicion);
-									Valores += valor +"%";
+									if(esnumero(valor) == true){
+										Valores += valor +"%";
+										String agregar = "ID"+valor;
+										D2.add(agregar);
+									}else{
+										//INGRESA UNA VARIABLE TIPO ENTERO
+									}
 								}else if(esnumero(Datos_id) == true){
 									Valores += Datos_id + "%";
+									String agregar = "ID"+Datos_id;
+									D2.add(agregar);
 								}else{
 									//INGRESA UN NUMERO O VARIABLE NUMERICA
 								}
@@ -434,6 +441,7 @@ public class Analizar {
 										
 										if(esnumero(Dato_valor) == false){
 											Valores += valor + "%";
+											D1.add(valor);
 										}else{
 											//INGRESA UNA VARIABLE TIPO CADENA
 										}
@@ -441,6 +449,7 @@ public class Analizar {
 										if(TieneComillas(Dato_valor) == true){
 											String valor = QuitarComillas(Dato_valor);
 											Valores += valor + "%";
+											D1.add(valor);
 										}else{
 											//LOS NOMBRES VAN ENTRE COMILLAS
 										}
@@ -476,7 +485,27 @@ public class Analizar {
 								}
 								
 							}else if(Arreglo_Linea[0].equals("parentesco")){ //-------------------------------------------- PARENTESCO
-								System.out.println("si hay parentesco ");
+								if(EstructuraCorrecta(Linea) == true){
+									String tmp = Arreglo_Linea[1];
+									String D_p = tmp.substring(0, tmp.length()-1);
+									
+										String[] Parentesco = D_p.split(",");
+										
+										if(Parentesco.length == 0){
+											
+										}else{
+											for(int x=0; x<Parentesco.length;x++){
+												
+												System.out.println();
+												System.out.println("pos " + x + " tiene " + Parentesco[x]);
+											}
+										}
+										
+									
+									
+								}else{
+									//FALTA DOS PUNTOS O PUNTO Y COMA
+								}
 								
 							}else{
 								//NO ES PALABRA RESERVADA
@@ -487,7 +516,6 @@ public class Analizar {
 							System.out.println("no incluyo dos puntos ");
 						}
 					}//FIN FOR
-					System.out.println("----------------fin del for-----------------");
 					i = i +5;
 				}else{
 					//NO LO CERRO ENTRE '}'
@@ -503,24 +531,62 @@ public class Analizar {
 		
 	}
 	
-	private boolean TodoCorrectoParen(String[] valores){
-		String[] Reservadas = {"padre","madre","hijo","hermano"};
-		boolean correcto = false;
-		for(int i=0; i<valores.length-1; i++){
-			int h=0;
-			while(valores[i] != Reservadas[h]){
-				if(valores[i].equals(Reservadas[h])){
-					correcto = true;
-				}else{
-					correcto = false;
-					break;
-				}
+	private void Metodo_Relacion(LinkedList<String> Relacion){
+		
+		for(int i=1; i<Relacion.size()-1; i++){
+			String tmp = Relacion.get(i).toString();
+			String actual = QuitarEspacios(tmp);
+			if(EstructuraCorrecta(actual) == true){
+				String[] Arreglo_Relacion = actual.split(":");
+				String ID_I = agregarseparador(Arreglo_Relacion[0]);
+				
+				
+			}else{
+				//NO ESCRIBIO PUNTO Y COMA O DOS PUNTOS
 			}
-			if(correcto = false){
-				break;
+			
+		}
+	}
+	
+	private String agregarseparador(String palabra){
+		char cara =0;
+		String retorno="";
+		for(int i=0; i<palabra.length(); i++){
+			cara = palabra.charAt(i);
+			if(cara == '(' || cara == ')'){
+				retorno += Character.toString(cara) + "%";
+			}else{
+				retorno += Character.toString(cara);
+			}
+		}
+		return retorno;
+	}
+	
+	private boolean espalabrareservada(String Palabra){
+		String[] Reservadas = {"abuelo","padre","madre","hijo","hermano"};
+		boolean correcto = false;
+		for(int i=0; i<Reservadas.length; i++){
+			if(Reservadas[i].equals(Palabra)){
+				correcto = true;
 			}
 		}
 		return correcto;
+	}
+	
+	private boolean tienecoma(String linea){
+		char cara = 0;
+		int c=0;
+		for(int i=0; i<linea.length(); i++){
+			cara = linea.charAt(i);
+			if(cara == ','){
+				c++;
+			}
+		}
+		if(c > 1){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
 	private boolean TieneComillas(String linea){
@@ -576,8 +642,6 @@ public class Analizar {
 	
 	private boolean Buscar_L1(String variable){
 		boolean encontrado=false;
-		int pos=0;
-		
 		try{
 			for(int i = 0; i<L1.size(); i++){
 				String Linea = L1.get(i).toString();
@@ -590,6 +654,21 @@ public class Analizar {
 		}
 		
 		
+		return encontrado;
+	}
+	
+	private boolean Buscar_D2(String variable){
+		boolean encontrado = false;
+		try{
+			for(int i=0; i<D2.size(); i++){
+				String linea = D2.get(i).toString();
+				if(linea.equals(variable)){
+					encontrado = true;
+				}
+			}
+		}catch(Exception e){
+			System.out.println("bug en buscar d2");
+		}
 		return encontrado;
 	}
 	
@@ -608,11 +687,29 @@ public class Analizar {
 		return posicion;
 	}
 	
+	private int Obtener_PosicionD2(String variable){
+		int pos=0;
+		try{
+			for(int i=0; i<D2.size(); i++){
+				String linea = D2.get(i).toString();
+				if(linea.equals(variable)){
+					pos = i;
+				}
+			}
+		}catch(Exception e){
+			System.out.println("bug en obtener d2");
+		}
+		return pos;
+	}
+	
 	private String Retornar_L3(int posicion){
 		String mandar = L3.get(posicion).toString();
 		return mandar;
 	}
 	
-	
+	private String Retornar_D1(int posicion){
+		String mandar = D1.get(posicion).toString();
+		return mandar;
+	}
 
 }
