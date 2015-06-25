@@ -532,20 +532,72 @@ public class Analizar {
 	}
 	
 	private void Metodo_Relacion(LinkedList<String> Relacion){
-		
+		String Agregando = "";
 		for(int i=1; i<Relacion.size()-1; i++){
 			String tmp = Relacion.get(i).toString();
 			String actual = QuitarEspacios(tmp);
 			if(EstructuraCorrecta(actual) == true){
 				String[] Arreglo_Relacion = actual.split(":");
-				String ID_I = agregarseparador(Arreglo_Relacion[0]);
 				
+				String ID_I = agregarseparador(Arreglo_Relacion[0]); //LO DEJAMOS..(%X%)..
+				System.out.println("mostrando id_i "+ ID_I);
+				String[] ValorID = ID_I.split("%");
+				if(Buscar_D2(ValorID[1]) == true){
+					
+					int pos = Obtener_PosicionD2(ValorID[1]);
+					String nombreID = Retornar_D1(pos);
+					Agregando += nombreID;
+					
+				}else if(esnumero(ValorID[1]) == true){
+					
+					String l = "ID"+ValorID[1];
+					int pos = Obtener_PosicionD2(l);
+					String nombreID = Retornar_D1(pos);
+					Agregando += nombreID;
+					
+				}else{
+					Agregando += "NULO";
+					//MANDAR A NODO NULL
+				}
+				
+				String tmp2 = Arreglo_Relacion[1]; //POR LA DERECHA :X,Y;
+				String VrsID = tmp2.substring(0, tmp2.length()-1); //QUITAMOS ';'
+				System.out.println("mostrando vrsid " + VrsID);
+				
+				String[] ValoresID = VrsID.split(",");
+				System.out.println();
+				System.out.println("mostrando valoresid "+ ValoresID[0]);
+				System.out.println("mostrando tamaño "+ ValoresID.length);
+				
+				if(ValoresID.length == 1){
+					if(Buscar_D2(ValoresID[0]) == true){
+						
+						int pos = Obtener_PosicionD2(ValoresID[0]);
+						String RelacionadoCon = Retornar_D1(pos);
+						Agregando += " -> " + RelacionadoCon + ";%";
+						
+					}else if(esnumero(ValoresID[0]) == true){
+						
+						String l = "ID"+ValoresID[0];
+						int pos = Obtener_PosicionD2(l);
+						String RelacionadoCon = Retornar_D1(pos);
+						Agregando += " -> " + RelacionadoCon + ";%";
+						
+					}else{
+						//MANDAR A NULO2
+						Agregando += " -> " + "NULO2" + ";%";
+					}
+				}else{
+					//TIENE MAS RELACIONES
+					System.out.println("tiene mas relaciones");
+				}
 				
 			}else{
 				//NO ESCRIBIO PUNTO Y COMA O DOS PUNTOS
 			}
 			
-		}
+		}//FIN FOR
+		System.out.println(Agregando);
 	}
 	
 	private String agregarseparador(String palabra){
@@ -553,8 +605,10 @@ public class Analizar {
 		String retorno="";
 		for(int i=0; i<palabra.length(); i++){
 			cara = palabra.charAt(i);
-			if(cara == '(' || cara == ')'){
+			if(cara == '('){
 				retorno += Character.toString(cara) + "%";
+			}else if(cara == ')'){
+				retorno += "%" + Character.toString(cara);
 			}else{
 				retorno += Character.toString(cara);
 			}
