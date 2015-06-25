@@ -14,6 +14,7 @@ public class Analizar {
 	public LinkedList<String> D1 = new LinkedList<String>();
 	public LinkedList<String> D2 = new LinkedList<String>();
 	public LinkedList<String> D3 = new LinkedList<String>();
+	Archivo ar = new Archivo();
 	
 	public void Separar(String Datos){
 		boolean EncabezadoActivado = false, VariablesActivado = false, ArbolActivado = false, cambio=false;
@@ -78,7 +79,6 @@ public class Analizar {
 		for(int j=0; j<ListadeEncabezado.size(); j++){
 			Linea += ListadeEncabezado.get(j);
 		}
-		//Linea += "}";
 		
 		int c=0;
 		char caracter = 0;
@@ -93,7 +93,6 @@ public class Analizar {
 			System.out.println("en encabezado falta una llave");
 			//METODO ENCABEZADO DEFAULT
 		}else{
-			System.out.println("en encabezado texto correcto");
 			Metodo_Encabezado(ListadeEncabezado);
 		}
 	}
@@ -116,7 +115,6 @@ public class Analizar {
 		if( c != 2){
 			System.out.println("en variable falta una llave");
 		}else{
-			System.out.println("en variable texto correcto");
 			Metodo_Variables(ListadeVariables);
 		}
 	}
@@ -200,8 +198,6 @@ public class Analizar {
 									texto += Character.toString(textoentrecomillas[txt]);
 								}
 								String[] algo = texto.split("%");
-								System.out.println("de arreglo algo "+ algo[0]);
-								System.out.println("lo que esta en comillas es " + texto);
 							}else{
 								//NO TIENE COMILLAS
 							}
@@ -221,7 +217,6 @@ public class Analizar {
 							String datos = Tokens[1].substring(0, Tokens[1].length()-2);
 							if(datos.equals("ON")){
 								Font negrita = new Font("Arial", Font.BOLD, 12);
-								System.out.println("tex: " + "\033[1mArbol");
 								//System.out.println("texto en negrita " + )
 							}else if( !datos.equals("OFF")){
 								System.out.println("escribio otra cosa");
@@ -282,7 +277,6 @@ public class Analizar {
 			temporal.add(auno[j]);
 		}
 		//A LA LISTA TEMPORAL LE AGREGAMOS ; AL FINAL A CADA ITERACION PARA SU POSTERIOR CONTEO
-		System.out.println("de lista temporal");
 		for(int h=0; h<temporal.size(); h++){
 			String linea = temporal.get(h).toString() + ";";
 			ListadeVariables.add(linea);
@@ -336,11 +330,6 @@ public class Analizar {
 			}
 		}//FIN FOR
 		//MOSTRANDO
-		System.out.println("mostrando resultado de L1 Y L3----- linea-------- ");
-		for(int po=0; po<L1.size(); po++){
-			System.out.println();
-			System.out.println("a ->"+ L1.get(po) + "<- corresponde ->" + L3.get(po)+"<-");
-		}
 	}
 	
 	private void Metodo_Arbol(LinkedList<String> Arbol){
@@ -537,10 +526,9 @@ public class Analizar {
 			String tmp = Relacion.get(i).toString();
 			String actual = QuitarEspacios(tmp);
 			if(EstructuraCorrecta(actual) == true){
-				String[] Arreglo_Relacion = actual.split(":");
+				String[] Arreglo_Relacion = actual.split(":"); //LO DIVIDIMOS USANDO ':'
 				
-				String ID_I = agregarseparador(Arreglo_Relacion[0]); //LO DEJAMOS..(%X%)..
-				System.out.println("mostrando id_i "+ ID_I);
+				String ID_I = agregarseparador(Arreglo_Relacion[0]); //POR LA IZQUIERDA LO DEJAMOS..(%X%)..
 				String[] ValorID = ID_I.split("%");
 				if(Buscar_D2(ValorID[1]) == true){
 					
@@ -562,34 +550,82 @@ public class Analizar {
 				
 				String tmp2 = Arreglo_Relacion[1]; //POR LA DERECHA :X,Y;
 				String VrsID = tmp2.substring(0, tmp2.length()-1); //QUITAMOS ';'
-				System.out.println("mostrando vrsid " + VrsID);
 				
 				String[] ValoresID = VrsID.split(",");
-				System.out.println();
-				System.out.println("mostrando valoresid "+ ValoresID[0]);
-				System.out.println("mostrando tamaño "+ ValoresID.length);
 				
 				if(ValoresID.length == 1){
 					if(Buscar_D2(ValoresID[0]) == true){
 						
 						int pos = Obtener_PosicionD2(ValoresID[0]);
 						String RelacionadoCon = Retornar_D1(pos);
-						Agregando += " -> " + RelacionadoCon + ";%";
+						Agregando += " -> " + RelacionadoCon + ";";
 						
 					}else if(esnumero(ValoresID[0]) == true){
 						
 						String l = "ID"+ValoresID[0];
 						int pos = Obtener_PosicionD2(l);
 						String RelacionadoCon = Retornar_D1(pos);
-						Agregando += " -> " + RelacionadoCon + ";%";
+						Agregando += " -> " + RelacionadoCon + ";";
 						
 					}else{
 						//MANDAR A NULO2
-						Agregando += " -> " + "NULO2" + ";%";
+						Agregando += " -> " + "NULO2" + ";";
 					}
-				}else{
-					//TIENE MAS RELACIONES
-					System.out.println("tiene mas relaciones");
+				}else{ //TIENE MAS RELACIONES
+					for(int h=0; h<ValoresID.length; h++){
+						
+						String Relaciones_Derecha = ValoresID[h];
+						
+						if(h == 0){ //POSICION 0 AGREGAMOS LO QUE YA VIENE
+							if(Buscar_D2(Relaciones_Derecha) == true){
+								
+								int pos = Obtener_PosicionD2(Relaciones_Derecha);
+								String RelacionadoCon = Retornar_D1(pos);
+								Agregando += " -> " + RelacionadoCon +";";
+								
+							}else if(esnumero(Relaciones_Derecha) == true){
+								
+								String l = "ID"+Relaciones_Derecha;
+								int pos = Obtener_PosicionD2(l);
+								String RelacionadoCon = Retornar_D1(pos);
+								Agregando += " -> " + RelacionadoCon + ";";
+								
+							}else{
+								Agregando += " -> NULO2;";
+							}
+						}else{ //DEMAS POSICIONES VALORID 1 + VALORESID[H]
+							if(Buscar_D2(Relaciones_Derecha) == true){
+								
+								int pos = Obtener_PosicionD2(Relaciones_Derecha);
+								String RelacionadoCon = Retornar_D1(pos);
+								
+								String le = "ID"+ValorID[1];
+								int posi = Obtener_PosicionD2(le);
+								String nombreID = Retornar_D1(posi);
+								
+								Agregando += nombreID + " -> " + RelacionadoCon + ";";
+								
+							}else if(esnumero(Relaciones_Derecha) == true){
+								
+								String l = "ID"+Relaciones_Derecha;
+								int pos = Obtener_PosicionD2(l);
+								String RelacionadoCon = Retornar_D1(pos);
+								
+								String le = "ID"+ValorID[1];
+								int posi = Obtener_PosicionD2(le);
+								String nombreID = Retornar_D1(posi);
+								
+								Agregando += nombreID + " -> " + RelacionadoCon + ";";
+								
+							}else{
+								String le = "ID"+ValorID[1];
+								int posi = Obtener_PosicionD2(le);
+								String nombreID = Retornar_D1(posi);
+								Agregando += nombreID + " -> NULO2;";
+							}
+						}
+						
+					}//FIN FOR
 				}
 				
 			}else{
@@ -597,7 +633,7 @@ public class Analizar {
 			}
 			
 		}//FIN FOR
-		System.out.println(Agregando);
+		ar.CrearGRAPHVIZ(Agregando);
 	}
 	
 	private String agregarseparador(String palabra){
