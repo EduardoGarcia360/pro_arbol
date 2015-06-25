@@ -1,10 +1,12 @@
 package Clases;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
@@ -140,6 +142,47 @@ public class Archivo {
 			archi.close();
 		} catch (FileNotFoundException e) {e.printStackTrace();}
 		  catch (DocumentException e) {e.printStackTrace();}
+	}
+	
+	public void CrearGRAPHVIZ(String contenido){
+		
+		try {
+			String texto = "digraph G{Maria -> Pedro"+"\nJuan -> Pedro}";   //------------SUSTITUIR POR CONTENIDO
+			File Archivo_Graphviz = new File("nuevo.gv");
+			FileWriter escritor = new FileWriter(Archivo_Graphviz);
+			BufferedWriter bw = new BufferedWriter(escritor);
+			PrintWriter pw = new PrintWriter(bw);
+			
+			pw.write(texto);
+			
+			pw.close();
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try{
+			String rutaDot = "C:\\E\\Progra\\Librerias_Externas\\release\\bin\\dot.exe";
+			String archivoGraphviz = "C:\\E\\Progra\\EclipseProjects\\ArbolGenealogico\\nuevo.gv";
+			String archivoImagen = "C:\\Users\\Edu\\Desktop\\grafo1.jpg";
+			String tParam = "-Tjpg";
+		    String tOParam = "-o";
+		    
+		    String[] cmd = new String[5];
+		      cmd[0] = rutaDot;
+		      cmd[1] = tParam;
+		      cmd[2] = archivoGraphviz;
+		      cmd[3] = tOParam;
+		      cmd[4] = archivoImagen;
+		      
+		      Runtime ruti = Runtime.getRuntime();
+		      
+		      ruti.exec(cmd);
+		}catch(Exception e){
+			System.out.println("error");
+		}
+		
 	}
 
 }

@@ -1,8 +1,11 @@
 package Clases;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Graphics2D;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -17,7 +20,12 @@ import com.itextpdf.text.DocumentException;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.swing.JTextArea;
 import javax.swing.JScrollBar;
@@ -29,6 +37,7 @@ public class Interfaz extends JFrame implements ActionListener {
 	Analizar analiza = new Analizar();
 	JButton btnAbrir, btnAcerca, btnAnalizar, btnGuardarc, btnGuardar;
 	JTextArea txtrTextarea;
+	
 
 	/**
 	 * Launch the application.
@@ -87,6 +96,17 @@ public class Interfaz extends JFrame implements ActionListener {
 		txtrTextarea.setText("textArea");
 		txtrTextarea.setBounds(145, 21, 416, 392);
 		contentPane.add(txtrTextarea);
+		
+		JButton btnPrueba = new JButton("prueba");
+		btnPrueba.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				
+				
+			}
+		});
+		btnPrueba.setBounds(28, 304, 89, 23);
+		contentPane.add(btnPrueba);
 	}
 	
 	void ObtenerRutaDeArchivo(){
