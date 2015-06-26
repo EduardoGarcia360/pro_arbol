@@ -1,5 +1,6 @@
 package Clases;
 
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,8 +26,18 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 public class Archivo {
 	
+	public boolean usoArchivo = false;
+	public String NombreArchivo="";
+	
 	public String AbrirARCHIVO(String ruta){
+		
+		String ree = ruta.replace('\\', '%');
+		String[] nomarchi = ree.split("%");
+		int ultimo = nomarchi.length-1;
+		NombreArchivo = nomarchi[ultimo];
+		
 			File archivo = new File(ruta);
+			
 			String temp="", retorno="";
 			try {
 				FileReader leer = new FileReader(archivo);
@@ -34,7 +45,8 @@ public class Archivo {
 				try {
 					while((temp = BR.readLine()) != null){
 						retorno = retorno + temp + "\n";
-					}	
+					}
+					usoArchivo = true;
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(null, "No hay datos en el archivo seleccionado","Advertencia",1);
 					e.printStackTrace();
@@ -147,19 +159,18 @@ public class Archivo {
 	public void CrearGRAPHVIZ(String contenido){
 		
 		try {
-			String texto = "digraph G{Maria -> Pedro"+"\nJuan -> Pedro}";   //------------SUSTITUIR POR CONTENIDO
+			String textoGraphviz = "digraph G{" + contenido + "}";
 			File Archivo_Graphviz = new File("nuevo.gv");
 			FileWriter escritor = new FileWriter(Archivo_Graphviz);
 			BufferedWriter bw = new BufferedWriter(escritor);
 			PrintWriter pw = new PrintWriter(bw);
 			
-			pw.write(texto);
+			pw.write(textoGraphviz);
 			
 			pw.close();
 			bw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("error" + e);
 		}
 		
 		try{
@@ -180,9 +191,76 @@ public class Archivo {
 		      
 		      ruti.exec(cmd);
 		}catch(Exception e){
-			System.out.println("error");
+			System.out.println("error" + e);
 		}
 		
 	}
+	
+	public void crearHTML(String datos){
+		
+		String parahtml="";
+		if(usoArchivo == true){
+			parahtml = NombreArchivo;
+		}else{
+			parahtml = "creado en area para codigo.";
+		}
+		
+		String head = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />"
+				+"<title>Tabla de Lexemas</title></head><body  style=\"background:#CCC\" ><p><img src=\"escudo.png\" "
+				+" alt=\"\" style=\"float:right;\"/><h2>";
+		String mitad = "<font color=\"green\">UNIVERSIDAD DE SAN CARLOS<br/>FACULTAD DE INGENIERIA<br/>ESCUELA DE CIENCIAS<br/>"
+				+"INGENIERIA EN CIENCIAS Y SISTEMAS<br/>LENGUAJES FORMALES Y DE PROGRAMACION</font></h2><br/><br/><br/><br/>";
+		
+		String nombreFuente = "<center><h3>Archivo Fuente: <font color=\"red\">"+parahtml+"</font><br/><br/><br/>";
+		
+		String nombreSalida = "Archivo Salida: <font color=\"red\">tabla de lexemas.html</font></h3></center></p><center>";
+		
+		String miTabla = "<table bordercolor=\"blue\" rules=\"all\">"
+		+"<tr><td>No. Token</td> <td>Token</td> <td>Lexema</td> <td>Palabra Reservada</td> <td>Tipo de Token</td></tr>";
+		
+		//FOR
+		
+		String finalHead = "</table></center></body></html>";
+		
+		String Pagina = head + mitad + nombreFuente + nombreSalida + miTabla + finalHead;
+		
+		try{
+			File correcto = new File("tabla de lexemas.html");
+			FileWriter escritor = new FileWriter(correcto);
+			BufferedWriter BW = new BufferedWriter(escritor);
+			PrintWriter salida = new PrintWriter(BW);
+			
+			salida.write(Pagina);
+			
+			salida.close();
+			BW.close();
+			
+			Desktop des = Desktop.getDesktop();
+			if(correcto.exists()){
+				des.open(correcto);
+			}
+		}catch(Exception e){
+			JOptionPane.showMessageDialog(null,"Error al guardar", "Notificacion", JOptionPane.ERROR_MESSAGE);
+		}
+		
+		
+	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

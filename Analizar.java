@@ -634,6 +634,7 @@ public class Analizar {
 			
 		}//FIN FOR
 		ar.CrearGRAPHVIZ(Agregando);
+		ar.crearHTML(null);
 	}
 	
 	private String agregarseparador(String palabra){
