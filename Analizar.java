@@ -1,20 +1,22 @@
 package Clases;
 
-import java.awt.Font;
+import java.io.IOException;
 import java.util.LinkedList;
-import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
 
+import com.itextpdf.text.DocumentException;
+
 public class Analizar {
-	
 	
 	public LinkedList<String> L1 = new LinkedList<String>();
 	public LinkedList<String> L3 = new LinkedList<String>();
 	public LinkedList<String> D1 = new LinkedList<String>();
 	public LinkedList<String> D2 = new LinkedList<String>();
-	public LinkedList<String> D3 = new LinkedList<String>();
+	public LinkedList<String> paraImprimir = new LinkedList<String>();
 	Archivo ar = new Archivo();
+	int contadorlexemas=0;
+	String LexemasdeCodigo="";
 	
 	public void Separar(String Datos){
 		boolean EncabezadoActivado = false, VariablesActivado = false, ArbolActivado = false, cambio=false;
@@ -93,6 +95,8 @@ public class Analizar {
 			System.out.println("en encabezado falta una llave");
 			//METODO ENCABEZADO DEFAULT
 		}else{
+			contadorlexemas++;
+			LexemasdeCodigo += contadorlexemas + "%Segmento%Encabezado%SI%Inicio Segmento%";
 			Metodo_Encabezado(ListadeEncabezado);
 		}
 	}
@@ -168,17 +172,32 @@ public class Analizar {
 						if( c==1 ){
 							String datos = Tokens[1].substring(0, Tokens[1].length()-2);
 							String[] contenido = datos.split(",");
-							System.out.println();
-							System.out.println(".- " + contenido[0]);
-							System.out.println();
-							System.out.println(".- " + contenido[1]);
-							System.out.println();
-							System.out.println(".- " + contenido[2]);
+							//CONTENIDO[0] ES RUTA DE IMAGEN
+							String rutaImagen = contenido[0];
+							String tmp = rutaImagen.replace('/', '\\');
+							String ruta = QuitarComillas(tmp);
+							Membrete.rutaImagen = ruta;
+							if(esnumero(contenido[1])){
+								int enx = Integer.parseInt(contenido[1]);
+								Membrete.PosX = enx;
+							}else{
+								
+							}
+							if(esnumero(contenido[2])){
+								int eny = Integer.parseInt(contenido[2]);
+								Membrete.PosY = eny;
+							}else{
+								
+							}
+							contadorlexemas++;
+							LexemasdeCodigo += contadorlexemas + "%Declaracion%Imagen%SI%Declara imagen%";
+							
 						}else{
 							//INCORRECTO FALTA (
 						}
 						
 					}else if(Tokens[0].equals("Texto")){
+						
 						char caracter=0;
 						int c=0;
 						for(int pos=0; pos<Tokens[1].length(); pos++){
@@ -192,19 +211,22 @@ public class Analizar {
 							
 							char[] textoentrecomillas = datos.toCharArray();
 							int f = textoentrecomillas.length;
-							//String texto="";
 							if(textoentrecomillas[0] == 34 && textoentrecomillas[f-1] == 34){
 								for(int txt=1; txt<f-1; txt++){
 									texto += Character.toString(textoentrecomillas[txt]);
 								}
-								String[] algo = texto.split("%");
+								Archivo.TEXTO = texto;
+								contadorlexemas++;
+								LexemasdeCodigo += contadorlexemas + "%Declaracion%Texto%SI%Declara cadena%";
 							}else{
 								//NO TIENE COMILLAS
 							}
 						}else{
 							//INCORRECTO FALTA (
 						}
+						
 					}else if(Tokens[0].equals("Negrita")){
+						
 						char caracter=0;
 						int c=0;
 						for(int pos=0; pos<Tokens[1].length(); pos++){
@@ -216,19 +238,75 @@ public class Analizar {
 						if( c== 1){
 							String datos = Tokens[1].substring(0, Tokens[1].length()-2);
 							if(datos.equals("ON")){
-								Font negrita = new Font("Arial", Font.BOLD, 12);
-								//System.out.println("texto en negrita " + )
-							}else if( !datos.equals("OFF")){
-								System.out.println("escribio otra cosa");
+								Archivo.NEGRITA = "ON";
+							}else if( datos.equals("OFF")){
+								Archivo.NEGRITA = "OFF";
+							}else{
+								Archivo.NEGRITA = "OFF";
+								//ERROR
 							}
-							
+							contadorlexemas++;
+							LexemasdeCodigo += contadorlexemas + "%Declaracion%Negrita%SI%Modifica texto a negrita%";
 						}else{
 							//INCORRECTO FALTA (
 						}
+						
 					}else if(Tokens[0].equals("Subrayado")){
+						
+						char caracter=0;
+						int c=0;
+						for(int pos=0; pos<Tokens[1].length(); pos++){
+							caracter = Tokens[1].charAt(pos);
+							if( caracter == ')'){
+								c++;
+							}
+						}
+						if( c== 1){
+							String datos = Tokens[1].substring(0, Tokens[1].length()-2);
+							if(datos.equals("ON")){
+								Archivo.SUBRAYADO = "ON";
+							}else if( datos.equals("OFF")){
+								Archivo.SUBRAYADO = "OFF";
+							}else{
+								Archivo.SUBRAYADO = "OFF";
+								//ERROR
+							}
+							contadorlexemas++;
+							LexemasdeCodigo += contadorlexemas + "%Declaracion%Subrayado%SI%Modifica texto a subrayado%";
+						}else{
+							//INCORRECTO FALTA (
+						}
 						
 					}else if(Tokens[0].equals("Cursiva")){
 						
+						char caracter=0;
+						int c=0;
+						for(int pos=0; pos<Tokens[1].length(); pos++){
+							caracter = Tokens[1].charAt(pos);
+							if( caracter == ')'){
+								c++;
+							}
+						}
+						if( c== 1){
+							String datos = Tokens[1].substring(0, Tokens[1].length()-2);
+							if(datos.equals("ON")){
+								Archivo.CURSIVA = "ON";
+							}else if( datos.equals("OFF")){
+								Archivo.CURSIVA = "OFF";
+							}else{
+								Archivo.CURSIVA = "OFF";
+								//ERROR
+							}
+							contadorlexemas++;
+							LexemasdeCodigo += contadorlexemas + "%Declaracion%Cursiva%SI%Modifica texto a cursivo%";
+						}else{
+							//INCORRECTO FALTA (
+						}
+						
+					}else if(Tokens[0].equals("imprimir")){
+						String enimprimir = Tokens[1].substring(0, Tokens[1].length()-2);
+						
+						Imprimir(enimprimir);
 					}
 				}else{
 					System.out.println("imagen o texto o .. incorrecto");
@@ -238,11 +316,248 @@ public class Analizar {
 				System.out.println("no termina con punto y coma");
 				//ERROR NO TERMINA CON PUNTO Y COMA
 			}
+		}//FIN FOR
+		for(int g=0; g<paraImprimir.size(); g++){
+			System.out.println();
+			System.out.println("posicion " + g + "->"+paraImprimir.get(g)+"<-");
 		}
 	}
 	
+	private void Imprimir(String linea){
+		LinkedList<String> almacenar = new LinkedList<String>();
+		boolean fin = false;
+		int estado = 0, indice = 0;
+		char token;
+		linea += "#";
+		System.out.println(linea);
+		
+		String lexema="";
+		int cantidad=0;
+		try{
+			while(fin != true){
+				token = linea.charAt(indice);
+				switch ( estado ){
+				case 0:
+					if(Character.isWhitespace(token)){
+						//PARA VER SI ES UN ESPACIO EN BLANCO
+						indice++;
+						estado=0;
+						
+					}else if(essimbolo(token) == true){
+						/**
+						 * SI ES UN SIMBOLO 
+						 * ¿QUE SIMBOLO ES?
+						 */
+						if(token == '"'){
+							indice++;
+							estado = 1;
+							
+						}else if(token == '+'){
+							/**
+							 * SI VIENE UN '+' QUIERE DECIR QUE VA A CONCATENAR
+							 * EJEMPLO (1): "TEXTO"+"CONCATENADO"
+							 * EJEMPLO (2): "EL NUMERO ES"+50
+							 */
+							char siguiente_caracter = linea.charAt(indice+1);
+							
+							if(siguiente_caracter == '"'){
+								indice++;
+								estado = 0;
+								
+							}else if(Character.isDigit(siguiente_caracter)){
+								indice++;
+								estado = 2;
+								
+							}
+						}else if(token == '#'){
+							/**
+							 * FINAL DE LINEA
+							 */
+							estado = 10;
+						}else{
+							/**
+							 * ERROR NO ES UN SIMBOLO VALIDO
+							 * PUEDE VENIR ASI
+							 * %%%ALGO
+							 */
+						}
+						
+					}else if(Character.isDigit(token)){
+						//PARA VER SI ES DIGITO
+						indice++;
+						estado = 2;
+						lexema += Character.toString(token);
+						
+					}else if(Character.isLetter(token)){
+						//PARA VER SI ES LETRA
+						indice++;
+						estado = 1;
+						lexema += Character.toString(token);
+						
+					}
+					break;
+				case 1:
+					/**
+					 * CASE PARA LETRAS
+					 */
+					if(Character.isWhitespace(token)){
+						/**
+						 * PUEDE VENIR ASI
+						 * "LA CASA ESTA EN"
+						 */
+						indice++;
+						estado = 1;
+						lexema += Character.toString(token);
+						
+					}else if(token == '"'){
+						//QUIERE DECIR QUE FINALIZO EL TEXTO ENTRE COMILLAS
+						char siguiente_caracter = linea.charAt(indice+1);
+						if(siguiente_caracter == '+'){
+							/**
+							 * PUEDE VENIR DE ALGUNA DE ESTAS FORMAS:
+							 * "LA CASA" + "ES ROJA"
+							 * "EL NUMERO ES " + 35
+							 */
+							indice++;
+							estado = 0;
+							almacenar.add(lexema);
+							/**
+							 * UNA VEZ AGREGADO A LA LISTA PASAMOS A LIMPIAR EL STRING LEXEMA
+							 * PARA QUE QUEDE ASI:
+							 * [LA CASA][..]...[..]
+							 * EN LA LISTA
+							 */
+							lexema="";
+							
+						}else if(siguiente_caracter == '#'){
+							//SI ES EL FINAL DE LA LINEA
+							almacenar.add(lexema);
+							lexema = "";
+							estado = 10;
+							
+						}else{
+							/**
+							 * ES ERROR POR QUE NO SE PUEDE LO SIGUIENTE:
+							 * "LA CASA"56
+							 * "LA CASA"ABC
+							 */
+						}
+					}else if(token == '#'){
+						//SI ES EL FINAL DE LA LINEA
+						estado = 10;
+						
+					}else if(essimbolo(token)){
+						/**
+						 * PUEDE VENIR ASI:
+						 * "LA CASA DE JAVIER ES: VERDE CON ROJO"
+						 */
+						indice++;
+						estado = 1;
+						lexema += Character.toString(token);
+						
+					}else if(Character.isLetter(token)){
+						//SI TIENE ESTA FORMA: abc56_ef
+						indice++;
+						estado = 1;
+						lexema += Character.toString(token);
+						
+					}else{
+						/**
+						 * ES ERROR
+						 */
+					}
+					break;
+				case 2:
+					/**
+					 * CASE PARA NUMEROS.
+					 */
+					if(Character.isWhitespace(token)){
+						/**
+						 * SI VIENE CON ESPACIO POR EJEMPLO:
+						 * 5            6       4    +
+						 * ENTONCES SOLO AVANZAMOS Y LO TOMAMOS ASI
+						 * 564+
+						 */
+						indice++;
+						estado = 2;
+						
+					}else if(Character.isDigit(token)){
+						//SI ES NUMERO
+						indice++;
+						estado = 2;
+						lexema += Character.toString(token);
+						
+					}else if(token == '+'){
+						/**
+						 * POR EJEMPLO VIENE ASI: ..3000+50
+						 * ACA ESTARIAMOS EN EL SIGNO '+' ACTUALMENTE
+						 */
+						char siguiente_caracter = linea.charAt(indice+1);
+						if(Character.isDigit(siguiente_caracter)){
+							/**
+							 * SI EL SIGUIENTE DEL SIGNO '+' ES DIGITO
+							 * EJEMPLO: 3000+50
+							 * ENTONCES CONVERTIMOS A INT LA CANTIDAD QUE YA TRAIAMOS
+							 * CANTIDAD = 3000 DESPUES VACIAMOS LEXEMA Y COMO EL SIGUIENTE 
+							 * ES NUMERO ENTONCES NOS QUEDAMOS EN EL CASE 2
+							 */
+							cantidad += (int) Integer.parseInt(lexema);
+							lexema="";
+							indice++;
+							estado = 2;
+							
+						}else if(siguiente_caracter == '"'){
+							/**
+							 * SI EL SIGUIENTE DEL SIGNO '+' ES ' " '
+							 * EJEMPLO: 3000+"CADENA"
+							 * ENTONCES AGREGAMOS LEXEMA A LA LISTA Y VACIAMOS LEXEMA
+							 */
+							almacenar.add(lexema);
+							lexema = "";
+							indice++;
+							estado = 0;
+						}else{
+							/**
+							 *ES ERROR YA QUE SI VIENE UN SIGNO '+' ES PARA CONCATENAR
+							 *EJEMPLO: 3000+50+//FINLINEA
+							 * 
+							 */
+						}
+						
+					}else if(token == '#'){
+						/**
+						 * LLEGO AL FINAL DE LA LINEA
+						 * EJEMPLO: 3000+50#
+						 */
+						almacenar.add(lexema);
+						lexema = "";
+						estado = 10;
+					}
+					break;
+				case 3:
+					/**
+					 * CASE PARA PALABRA RESERVADA
+					 */
+					break;
+				case 10:
+					fin = true;
+					break;
+				}
+			}
+		}catch(Exception e){
+			System.out.println("BUG EN IMPRIMIR");
+		}
+		String texto_actual="";
+		for(int i=0; i<almacenar.size(); i++){
+			texto_actual += almacenar.get(i);
+		}
+		paraImprimir.add(texto_actual);
+		
+	}
+	
+	
 	private boolean Validar(String a){
-		String [] Reservadas = {"Imagen:", "Texto", "Negrita", "Cursiva", "Subrayado"};
+		String [] Reservadas = {"Imagen:", "Texto", "Negrita", "Cursiva", "Subrayado", "imprimir"};
 		boolean correcto = false;
 		for(int i=0; i<Reservadas.length; i++){
 			if(a.equals( Reservadas[i] ) ){
@@ -516,7 +831,6 @@ public class Analizar {
 			}
 			
 		}//FIN FOR
-		System.out.println(Valores);
 		
 	}
 	
@@ -634,7 +948,14 @@ public class Analizar {
 			
 		}//FIN FOR
 		ar.CrearGRAPHVIZ(Agregando);
-		ar.crearHTML(null);
+		ar.crearHTML(LexemasdeCodigo);
+		try {
+			ar.CrearPDF();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private String agregarseparador(String palabra){
@@ -653,31 +974,16 @@ public class Analizar {
 		return retorno;
 	}
 	
-	private boolean espalabrareservada(String Palabra){
-		String[] Reservadas = {"abuelo","padre","madre","hijo","hermano"};
-		boolean correcto = false;
-		for(int i=0; i<Reservadas.length; i++){
-			if(Reservadas[i].equals(Palabra)){
-				correcto = true;
+	private boolean essimbolo(char token){
+		boolean aprovacion = false;
+		char[] simbolos = {'"','(',')',';','+','-','/','*',':'};
+		for(int i=0; i<simbolos.length;i++){
+			char actual = simbolos[i];
+			if(actual == token){
+				aprovacion = true;
 			}
 		}
-		return correcto;
-	}
-	
-	private boolean tienecoma(String linea){
-		char cara = 0;
-		int c=0;
-		for(int i=0; i<linea.length(); i++){
-			cara = linea.charAt(i);
-			if(cara == ','){
-				c++;
-			}
-		}
-		if(c > 1){
-			return true;
-		}else{
-			return false;
-		}
+		return aprovacion;
 	}
 	
 	private boolean TieneComillas(String linea){
