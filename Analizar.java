@@ -1,6 +1,7 @@
 package Clases;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
@@ -19,11 +20,13 @@ public class Analizar {
 	String LexemasdeCodigo="";
 	
 	public void Separar(String Datos){
+		LimpiarTodo();
 		boolean EncabezadoActivado = false, VariablesActivado = false, ArbolActivado = false, cambio=false;
 		LinkedList<String> paraEncabezado = new LinkedList<String>();
 		LinkedList<String> paraVariables = new LinkedList<String>();
 		LinkedList<String> paraArbol = new LinkedList<String>();
 		String[] TokensSeparar = Datos.split("\n");
+		
 		
 		for(int i=0; i<TokensSeparar.length; i++){
 			
@@ -158,6 +161,7 @@ public class Analizar {
 			if(token.endsWith(";")){ //SI TERMINA CON ;
 				
 				String[] Tokens = token.split("\\(");
+				
 				if(Validar(Tokens[0])==true){
 					
 					if(Tokens[0].equals("Imagen:")){
@@ -304,9 +308,15 @@ public class Analizar {
 						}
 						
 					}else if(Tokens[0].equals("imprimir")){
-						String enimprimir = Tokens[1].substring(0, Tokens[1].length()-2);
 						
-						Imprimir(enimprimir);
+						
+						String nuevo = token.replaceFirst("\\(", "\\(%");
+						String[] contenido_paraImprimir = nuevo.split("%");
+						String condiciones = contenido_paraImprimir[1].substring(0, contenido_paraImprimir[1].length()-2);
+						
+						Imprimir(condiciones);
+						System.out.println("paso");
+						
 					}
 				}else{
 					System.out.println("imagen o texto o .. incorrecto");
@@ -331,8 +341,10 @@ public class Analizar {
 		linea += "#";
 		System.out.println(linea);
 		
+		
 		String lexema="";
 		int cantidad=0;
+		String Operando="";
 		try{
 			while(fin != true){
 				token = linea.charAt(indice);
@@ -355,7 +367,7 @@ public class Analizar {
 						}else if(token == '+'){
 							/**
 							 * SI VIENE UN '+' QUIERE DECIR QUE VA A CONCATENAR
-							 * EJEMPLO (1): "TEXTO"+"CONCATENADO"
+							 * EJEMPLO (1): "TEXTO" + "CONCATENADO"
 							 * EJEMPLO (2): "EL NUMERO ES"+50
 							 */
 							char siguiente_caracter = linea.charAt(indice+1);
@@ -368,7 +380,14 @@ public class Analizar {
 								indice++;
 								estado = 2;
 								
+							}else if(Character.isWhitespace(siguiente_caracter)){
+								indice++;
+								estado=0;
 							}
+						}else if(token == '('){
+							indice++;
+							estado=2;
+							System.out.println("->CAYO EN ESTADO 0 CON ( AHORA AL ESTADO 2");
 						}else if(token == '#'){
 							/**
 							 * FINAL DE LINEA
@@ -390,10 +409,14 @@ public class Analizar {
 						
 					}else if(Character.isLetter(token)){
 						//PARA VER SI ES LETRA
+						
 						indice++;
 						estado = 1;
 						lexema += Character.toString(token);
+						System.out.println(lexema);
 						
+					}else if(token == '#'){
+						estado = 10;
 					}
 					break;
 				case 1:
@@ -435,6 +458,9 @@ public class Analizar {
 							lexema = "";
 							estado = 10;
 							
+						}else if(Character.isWhitespace(siguiente_caracter)){
+							indice++;
+							estado=0;
 						}else{
 							/**
 							 * ES ERROR POR QUE NO SE PUEDE LO SIGUIENTE:
@@ -456,15 +482,25 @@ public class Analizar {
 						lexema += Character.toString(token);
 						
 					}else if(Character.isLetter(token)){
-						//SI TIENE ESTA FORMA: abc56_ef
+						//SI ES LETRA
 						indice++;
 						estado = 1;
 						lexema += Character.toString(token);
+						if(lexema.equals("sqrt")){ //--------------------------- VERIFICA PALABRA RESERVADA
+							Operando = lexema;
+							//almacenar.add(lexema);
+							lexema="";
+							System.out.println("lo que esta en:"+lexema);
+							estado = 0;
+						}
+						
 						
 					}else{
 						/**
 						 * ES ERROR
 						 */
+						System.out.println("error:"+lexema);
+						estado = 10;
 					}
 					break;
 				case 2:
@@ -509,11 +545,27 @@ public class Analizar {
 						}else if(siguiente_caracter == '"'){
 							/**
 							 * SI EL SIGUIENTE DEL SIGNO '+' ES ' " '
-							 * EJEMPLO: 3000+"CADENA"
-							 * ENTONCES AGREGAMOS LEXEMA A LA LISTA Y VACIAMOS LEXEMA
+							 * EJEMPLO (1): 3000+"CADENA"
+							 * EJEMPLO (2): 5+4+"CADENA"
+							 * EN EL CASO DEL EJEMPLO (2) PRIMERO VERIFICAMOS SI YA TRAEMOS
+							 * ALGUNA CANTIDAD ANTERIORMENTE POR ESO LA LINEA DE 
+							 * CANTIDAD += (INT)....
+							 * SI CANTIDAD = 0 ENTONCES SIMPLEMENTE AGREGAMOS A LA LISTA YA QUE SERIA COMO EL EJEMPLO(1)
+							 * SOLO ES UNA CANTIDAD, PERO SI CANTIDAD ES DIFERENTE A 0 OSEA QUE SI YA HIZIMOS UNA SUMA COMO
+							 * EN EL EJEMPLO(2) ENTONCES LO QUE NECESITAMOS ES AGREGAR ESA SUMA.
 							 */
-							almacenar.add(lexema);
+							cantidad += (int) Integer.parseInt(lexema);
+							if(cantidad == 0){
+								almacenar.add(lexema);
+							}else{
+								String tmp = Integer.toString(cantidad);
+								almacenar.add(tmp);
+							}
+							
 							lexema = "";
+							indice++;
+							estado = 0;
+						}else if(Character.isWhitespace(siguiente_caracter)){
 							indice++;
 							estado = 0;
 						}else{
@@ -528,9 +580,55 @@ public class Analizar {
 						/**
 						 * LLEGO AL FINAL DE LA LINEA
 						 * EJEMPLO: 3000+50#
+						 * ENTONCES SUMAMOS LAS CANTIDADES
 						 */
-						almacenar.add(lexema);
+						cantidad += (int) Integer.parseInt(lexema);
+						String tmp = Integer.toString(cantidad);
+						almacenar.add(tmp);
 						lexema = "";
+						estado = 10;
+					}else if(token == ')'){ //-----------------------------------------CALCULAR RAIZ
+						
+						/**
+						 * SI ENCUENTRA ')' ENTONCES ESTAMOS ACA
+						 * SQRT(100')' PROCEDEMOS A HACER LA RAIZ
+						 * EN LEXEMA: 100 
+						 * LO SIGUIENTE QUE PUEDE VENIR SERIA
+						 * EJEMPLO (1): SQRT(100)#
+						 * EJEMPLO (2): SQRT(100)+5
+						 * EJEMPLO (3): SQRT(100)+"TEXTO"
+						 */
+						if(Operando.equals("sqrt")){
+							int cant = Integer.parseInt(lexema);
+							Double Raiz_Cuadrada = Math.sqrt(cant);
+							
+							String almacenar_raiz = Double.toString(Raiz_Cuadrada);
+							almacenar.add(almacenar_raiz);
+						}
+						
+						//indice++;
+						
+						char siguiente_caracter = linea.charAt(indice+1);
+						
+						if(siguiente_caracter == '#'){
+							indice++;
+							estado = 0;
+							
+						}else if(siguiente_caracter == '+'){
+							indice++;
+							estado = 0;
+						}else if(Character.isWhitespace(siguiente_caracter)){
+							indice++;
+							estado = 0;
+						}else{
+							System.out.println("--------------erro--------------");
+						}
+						
+						
+						
+						
+					}else{
+						//ERROR
 						estado = 10;
 					}
 					break;
@@ -555,9 +653,16 @@ public class Analizar {
 		
 	}
 	
+	private void LimpiarTodo(){
+		paraImprimir.clear();
+		L1.clear();
+		L3.clear();
+		D1.clear();
+		D2.clear();
+	}
 	
 	private boolean Validar(String a){
-		String [] Reservadas = {"Imagen:", "Texto", "Negrita", "Cursiva", "Subrayado", "imprimir"};
+		String [] Reservadas = {"Imagen:", "Texto", "Negrita", "Cursiva", "Subrayado", "imprimir","sqrt","SQRT","exp","EXP","fact","FACT"};
 		boolean correcto = false;
 		for(int i=0; i<Reservadas.length; i++){
 			if(a.equals( Reservadas[i] ) ){
@@ -696,8 +801,8 @@ public class Analizar {
 	}
 	
 	private void Metodo_Persona(LinkedList<String> Persona){
-		
 		String Valores="";
+		
 		for(int i=0; i<Persona.size(); i++){
 			
 			String Linea_Codigo = Persona.get(i).toString();
