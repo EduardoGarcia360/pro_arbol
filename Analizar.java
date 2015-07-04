@@ -315,8 +315,6 @@ public class Analizar {
 						String condiciones = contenido_paraImprimir[1].substring(0, contenido_paraImprimir[1].length()-2);
 						
 						Imprimir(condiciones);
-						System.out.println("paso");
-						
 					}
 				}else{
 					System.out.println("imagen o texto o .. incorrecto");
@@ -339,10 +337,8 @@ public class Analizar {
 		int estado = 0, indice = 0;
 		char token;
 		linea += "#";
-		System.out.println(linea);
 		
-		
-		String lexema="";
+		String lexema="", base="", exponente="", numero="";
 		int cantidad=0;
 		String Operando="";
 		try{
@@ -385,9 +381,12 @@ public class Analizar {
 								estado=0;
 							}
 						}else if(token == '('){
+							/**
+							 * CONDICIONAR SI EL SIGUIENTE ES NUMERO
+							 */
 							indice++;
 							estado=2;
-							System.out.println("->CAYO EN ESTADO 0 CON ( AHORA AL ESTADO 2");
+							
 						}else if(token == '#'){
 							/**
 							 * FINAL DE LINEA
@@ -413,7 +412,7 @@ public class Analizar {
 						indice++;
 						estado = 1;
 						lexema += Character.toString(token);
-						System.out.println(lexema);
+						
 						
 					}else if(token == '#'){
 						estado = 10;
@@ -488,14 +487,16 @@ public class Analizar {
 						lexema += Character.toString(token);
 						if(lexema.equals("sqrt")){ //--------------------------- VERIFICA POSIBLE PALABRA RESERVADA
 							Operando = lexema;
-							//almacenar.add(lexema);
 							lexema="";
-							System.out.println("lo que esta en:"+lexema);
 							estado = 0;
 						}else if(lexema.equals("exp")){
-							
+							Operando = lexema;
+							lexema="";
+							estado=0;
 						}else if(lexema.equals("fact")){
-							
+							Operando = lexema;
+							lexema="";
+							estado=0;
 						}
 					}else{
 						/**
@@ -582,6 +583,8 @@ public class Analizar {
 							 *EJEMPLO: 3000+50+//FINLINEA
 							 * 
 							 */
+							almacenar.add("error");
+							estado = 10;
 						}
 						
 					}else if(token == '#'){
@@ -598,8 +601,9 @@ public class Analizar {
 					}else if(token == ')'){ //-----------------------------------------CALCULAR RAIZ
 						
 						/**
-						 * SI ENCUENTRA ')' ENTONCES ESTAMOS ACA
-						 * SQRT(100')' PROCEDEMOS A HACER LA RAIZ
+						 * SI ENCUENTRA ')' ENTONCES ESTAMOS ACA:
+						 * SQRT(100')' O EXP(2,3')' O FACT(4')'
+						 * PROCEDEMOS A HACER LO QUE PIDE.
 						 * EN LEXEMA: 100 
 						 * LO SIGUIENTE QUE PUEDE VENIR SERIA
 						 * EJEMPLO (1): SQRT(100)#
@@ -609,12 +613,32 @@ public class Analizar {
 						if(Operando.equals("sqrt")){
 							int cant = Integer.parseInt(lexema);
 							Double Raiz_Cuadrada = Math.sqrt(cant);
-							
 							String almacenar_raiz = Double.toString(Raiz_Cuadrada);
 							almacenar.add(almacenar_raiz);
+							
+						}else if(Operando.equals("exp")){
+							exponente = lexema;
+							int cant_base = Integer.parseInt(base);
+							int cant_expo = Integer.parseInt(exponente);
+							int potencia = (int) Math.pow(cant_base, cant_expo);
+							String almacenar_potencia = Integer.toString(potencia);
+							almacenar.add(almacenar_potencia);
+							
+						}else if(Operando.equals("fact")){
+							numero = lexema;
+							int cant_numero = Integer.parseInt(numero);
+							if(cant_numero == 1){
+								almacenar.add("1");
+							}else{
+								int fac=1;
+								for(int t=cant_numero; t>1; t--){
+									fac = fac * t;
+								}
+								String almacenar_factorial = Integer.toString(fac);
+								almacenar.add(almacenar_factorial);
+								
+							}
 						}
-						
-						//indice++;
 						
 						char siguiente_caracter = linea.charAt(indice+1);
 						
@@ -629,12 +653,40 @@ public class Analizar {
 							indice++;
 							estado = 0;
 						}else{
-							System.out.println("--------------erro--------------");
+							almacenar.add("error");
 						}
 						
 						
 						
 						
+					}else if(token == ','){
+						base = lexema;
+						indice++;
+						estado=2;
+						lexema="";
+						
+					}else if(essimbolo(token)){
+						/**
+						 * SI ES SIMBOLO ¿QUE SIMBOLO ES?
+						 */
+						if(token == '-'){ //VA A RESTAR
+							/**
+							 * EJEMPLO: 50-4
+							 */
+							char siguiente_caracter = linea.charAt(indice+1);
+							if(Character.isDigit(siguiente_caracter)){
+								cantidad -= (int) Integer.parseInt(lexema);
+								lexema="";
+								indice++;
+								estado=2;
+							}else if(Character.isWhitespace(siguiente_caracter)){
+								indice++;
+								estado=0;
+							}else{
+								almacenar.add("error");
+								estado=10;
+							}
+						}
 					}else{
 						//ERROR
 						estado = 10;
@@ -1065,9 +1117,9 @@ public class Analizar {
 		try {
 			ar.CrearPDF();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("error no se encuentra la imagen");
 		} catch (DocumentException e) {
-			e.printStackTrace();
+			System.out.println("error no se encuentra el archivo");
 		}
 	}
 	
