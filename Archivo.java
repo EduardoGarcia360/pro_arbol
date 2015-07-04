@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -19,15 +20,18 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.TabStop.Alignment;
 import com.itextpdf.text.pdf.PdfWriter;
 
 public class Archivo {
 	
 	public boolean usoArchivo = false;
 	public String NombreArchivo="";
+	public static String TEXTO, NEGRITA, CURSIVA, SUBRAYADO;
 	
 	public String AbrirARCHIVO(String ruta){
 		
@@ -130,30 +134,54 @@ public class Archivo {
 		
 		try {
 			
-			String Encabezado = "UNIVERSIDAD DE SAN CARLOS DE GUATEMALA"
-					+"\nFACULTAD DE INGENIERIA"
-					+"\nESCUELA DE CIENCIAS"
-					+"\nINGENIERIA EN CIENCIAS Y SISTEMAS"
-					+"\nLENGUAJES FORMALES Y DE PROGRAMACION";
 			String saltodelinea = System.getProperty("line.separator");
 			
 			Document archi = new Document(PageSize.LETTER);
-			PdfWriter escritor = PdfWriter.getInstance(archi, new FileOutputStream("salida.pdf"));
+			PdfWriter escritor = PdfWriter.getInstance(archi, new FileOutputStream("ArchivodeArbol.pdf"));
+			
 			Membrete Imagen_Encabezado = new Membrete();
 			escritor.setPageEvent(Imagen_Encabezado);
+			Image imagen = Image.getInstance("C:\\Users\\Edu\\Desktop\\grafo1.png");
+			imagen.setAlignment(Element.ALIGN_CENTER);
 			archi.open();
+			Paragraph txt = new Paragraph(TEXTO);
+			if(NEGRITA.equals("ON")){
+				txt.getFont().setStyle(Font.BOLD);	
+			}
+			if(CURSIVA.equals("ON")){
+				txt.getFont().setStyle(Font.ITALIC);
+			}
+			if(SUBRAYADO.equals("ON")){
+				txt.getFont().setStyle(Font.STRIKETHRU);
+			}
+			txt.getFont().setSize(25);
+			txt.setAlignment(Element.ALIGN_CENTER);
+			archi.add(txt);
 			
-			archi.add(new Paragraph(Encabezado));
-			archi.add(new Paragraph(saltodelinea));
-			archi.add(new Paragraph("posicion de este texto"));
 			archi.add(new Paragraph(saltodelinea));
 			archi.add(new Paragraph(saltodelinea));
 			archi.add(new Paragraph(saltodelinea));
-			archi.add(new Paragraph("posicion de este texto 2"));
-			
+			archi.add(new Paragraph(saltodelinea));
+			archi.add(new Paragraph(saltodelinea));
+			archi.add(new Paragraph(saltodelinea));
+			archi.add(new Paragraph(saltodelinea));
+			archi.add(new Paragraph(saltodelinea));
+			//archi.add(new Paragraph("posicion de este texto 2"));
+			archi.add(new Paragraph(saltodelinea));
+			archi.add(new Paragraph(saltodelinea));
+			archi.add(imagen);
 			archi.close();
 		} catch (FileNotFoundException e) {e.printStackTrace();}
 		  catch (DocumentException e) {e.printStackTrace();}
+		try{
+		//File elpdf = new File("ArchivodeArbol.pdf");
+			//Desktop des = Desktop.getDesktop();
+			//if(elpdf.exists()){
+				//des.open(elpdf);
+			//}
+		}catch(Exception e){
+			
+		}
 	}
 	
 	public void CrearGRAPHVIZ(String contenido){
@@ -176,8 +204,8 @@ public class Archivo {
 		try{
 			String rutaDot = "C:\\E\\Progra\\Librerias_Externas\\release\\bin\\dot.exe";
 			String archivoGraphviz = "C:\\E\\Progra\\EclipseProjects\\ArbolGenealogico\\nuevo.gv";
-			String archivoImagen = "C:\\Users\\Edu\\Desktop\\grafo1.jpg";
-			String tParam = "-Tjpg";
+			String archivoImagen = "C:\\Users\\Edu\\Desktop\\grafo1.png";
+			String tParam = "-Tpng";
 		    String tOParam = "-o";
 		    
 		    String[] cmd = new String[5];
@@ -219,10 +247,19 @@ public class Archivo {
 		+"<tr><td>No. Token</td> <td>Token</td> <td>Lexema</td> <td>Palabra Reservada</td> <td>Tipo de Token</td></tr>";
 		
 		//FOR
+		String datosv2 = datos.substring(0, datos.length()-1);
+		String [] LexemasenCodigo = datosv2.split("%");
+		String contenidoFila="";
+		int PosFinal = LexemasenCodigo.length;
+			for(int i=0; i<PosFinal; i++){
+				
+				contenidoFila += "<tr><td>"+LexemasenCodigo[i]+"</td><td>"+LexemasenCodigo[i+1]+"</td><td>"+LexemasenCodigo[i+2]+"</td><td>"+LexemasenCodigo[i+3]+"</td>"+"<td>"+LexemasenCodigo[i+4]+"</td></tr>";
+				i = i + 4;
+			}
 		
 		String finalHead = "</table></center></body></html>";
 		
-		String Pagina = head + mitad + nombreFuente + nombreSalida + miTabla + finalHead;
+		String Pagina = head + mitad + nombreFuente + nombreSalida + miTabla + contenidoFila + finalHead;
 		
 		try{
 			File correcto = new File("tabla de lexemas.html");
@@ -235,10 +272,10 @@ public class Archivo {
 			salida.close();
 			BW.close();
 			
-			Desktop des = Desktop.getDesktop();
-			if(correcto.exists()){
-				des.open(correcto);
-			}
+			//Desktop des = Desktop.getDesktop();
+			//if(correcto.exists()){
+				//des.open(correcto);
+			//}
 		}catch(Exception e){
 			JOptionPane.showMessageDialog(null,"Error al guardar", "Notificacion", JOptionPane.ERROR_MESSAGE);
 		}

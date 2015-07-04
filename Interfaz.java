@@ -2,6 +2,7 @@ package Clases;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.Graphics2D;
 
@@ -35,7 +36,7 @@ public class Interfaz extends JFrame implements ActionListener {
 	private JPanel contentPane;
 	Archivo ar = new Archivo();
 	Analizar analiza = new Analizar();
-	JButton btnAbrir, btnAcerca, btnAnalizar, btnGuardarc, btnGuardar;
+	JButton btnAbrir, btnAcerca, btnAnalizar, btnGuardarc, btnGuardar, btnMusuario;
 	JTextArea txtrTextarea;
 	
 
@@ -65,7 +66,7 @@ public class Interfaz extends JFrame implements ActionListener {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
+		this.setTitle("Aplicacion de Arbol Genealogico");
 		
 		btnAbrir = new JButton("Abrir");
 		btnAbrir.addActionListener(this);
@@ -87,26 +88,23 @@ public class Interfaz extends JFrame implements ActionListener {
 		btnAnalizar.setBounds(28, 185, 89, 23);
 		contentPane.add(btnAnalizar);
 		
-		btnAcerca = new JButton("Acerca");
+		btnAcerca = new JButton("Acerca de..");
 		btnAcerca.addActionListener(this);
 		btnAcerca.setBounds(28, 233, 89, 23);
 		contentPane.add(btnAcerca);
 		
 		txtrTextarea = new JTextArea();
-		txtrTextarea.setText("textArea");
 		txtrTextarea.setBounds(145, 21, 416, 392);
 		contentPane.add(txtrTextarea);
 		
-		JButton btnPrueba = new JButton("prueba");
-		btnPrueba.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				
-				
-				
-			}
-		});
-		btnPrueba.setBounds(28, 304, 89, 23);
-		contentPane.add(btnPrueba);
+		JButton btnMtecnico = new JButton("M. Tecnico");
+		btnMtecnico.setBounds(28, 277, 89, 23);
+		contentPane.add(btnMtecnico);
+		
+		btnMusuario = new JButton("M. Usuario");
+		btnMusuario.addActionListener(this);
+		btnMusuario.setBounds(28, 326, 89, 23);
+		contentPane.add(btnMusuario);
 	}
 	
 	void ObtenerRutaDeArchivo(){
@@ -134,6 +132,22 @@ public class Interfaz extends JFrame implements ActionListener {
 		if(e.getSource() == btnAnalizar){
 			String codigo = txtrTextarea.getText();
 			analiza.Separar(codigo);
+		}
+		
+		if(e.getSource() == btnMusuario){
+			try{
+				File musuario = new File("Usuario.pdf");
+				Desktop des = Desktop.getDesktop();
+				if(musuario.exists()){
+					des.open(musuario);
+				}
+			}catch(Exception ex){
+				JOptionPane.showMessageDialog(null, "Error en abrir","Advertencia",JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
+		
+		if(e.getSource() == btnAcerca){
+			JOptionPane.showMessageDialog(null, "Eduardo Antonio Garcia Franco \n 2012-12961 \n Lenguajes Formales 27/06/2015","Proyecto 1", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 }

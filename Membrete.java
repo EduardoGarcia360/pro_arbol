@@ -12,11 +12,20 @@ public class Membrete extends PdfPageEventHelper {
 	
 	 private Image imagen;
 	 PdfPTable table = new PdfPTable(2);
-	
+	 public static String rutaImagen;
+	 public static int PosX, PosY;
+	 
 	public Membrete(){
 		 try
 	        {
-	            imagen = Image.getInstance(this.getClass().getResource("escudo.png"));
+	            try{
+	            	imagen = Image.getInstance(rutaImagen);
+	            	//imagen.scaleToFit(PosX, PosY);
+	            }catch(Exception e){
+	            	imagen = Image.getInstance("escudo.png");
+	            	//imagen.scaleToFit(PosX, PosY);
+	            }
+			 	
 	            imagen.setAbsolutePosition(400, 590f);          
 	            
 	            table.setTotalWidth(350f);            

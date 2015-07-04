@@ -421,7 +421,7 @@ public class Analizar {
 					break;
 				case 1:
 					/**
-					 * CASE PARA LETRAS
+					 * CASE PARA LETRAS---------------------------------------------------------------------------------------------------------
 					 */
 					if(Character.isWhitespace(token)){
 						/**
@@ -486,15 +486,17 @@ public class Analizar {
 						indice++;
 						estado = 1;
 						lexema += Character.toString(token);
-						if(lexema.equals("sqrt")){ //--------------------------- VERIFICA PALABRA RESERVADA
+						if(lexema.equals("sqrt")){ //--------------------------- VERIFICA POSIBLE PALABRA RESERVADA
 							Operando = lexema;
 							//almacenar.add(lexema);
 							lexema="";
 							System.out.println("lo que esta en:"+lexema);
 							estado = 0;
+						}else if(lexema.equals("exp")){
+							
+						}else if(lexema.equals("fact")){
+							
 						}
-						
-						
 					}else{
 						/**
 						 * ES ERROR
@@ -505,7 +507,7 @@ public class Analizar {
 					break;
 				case 2:
 					/**
-					 * CASE PARA NUMEROS.
+					 * CASE PARA NUMEROS.---------------------------------------------------------------------------------------------------------
 					 */
 					if(Character.isWhitespace(token)){
 						/**
@@ -560,6 +562,7 @@ public class Analizar {
 							}else{
 								String tmp = Integer.toString(cantidad);
 								almacenar.add(tmp);
+								cantidad = 0;
 							}
 							
 							lexema = "";
@@ -568,6 +571,11 @@ public class Analizar {
 						}else if(Character.isWhitespace(siguiente_caracter)){
 							indice++;
 							estado = 0;
+						
+						}else if(Character.isLetter(siguiente_caracter)){
+							/**
+							 * SI ES DE ESTA FORMA 5 + SQRT(100)
+							 */
 						}else{
 							/**
 							 *ES ERROR YA QUE SI VIENE UN SIGNO '+' ES PARA CONCATENAR
