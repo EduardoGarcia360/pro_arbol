@@ -909,6 +909,16 @@ public class Analizar {
 		}
 		
 		for(int p=0; p<ListadeVariables.size(); p++){
+			//PARA IMPRIMIR
+			String[] lineamostra = ListadeVariables.get(p).split("\\(");
+			if(lineamostra[0].equals("imprimir")){
+				String nuevo = ListadeVariables.get(p).toString().replaceFirst("\\(", "\\(%");
+				String[] contenido_paraImprimir = nuevo.split("%");
+				String condiciones = contenido_paraImprimir[1].substring(0, contenido_paraImprimir[1].length()-2);
+				
+				Imprimir(condiciones,"variables");
+			}
+			
 			String Token = ListadeVariables.get(p);
 			char[] aChartmp = Token.toCharArray();
 			int c=0;
@@ -956,6 +966,10 @@ public class Analizar {
 			}
 		}//FIN FOR
 		//MOSTRANDO
+		for(int g=0; g<paraImprimirFinal.size(); g++){
+			System.out.println();
+			System.out.println("final posicion " + g + "->"+paraImprimirFinal.get(g)+"<-");
+		}
 	}
 	
 	private void Metodo_Arbol(LinkedList<String> Arbol){

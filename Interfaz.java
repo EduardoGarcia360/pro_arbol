@@ -110,7 +110,7 @@ public class Interfaz extends JFrame implements ActionListener {
 	void ObtenerRutaDeArchivo(){
 		try{
 			String ruta, datos;
-			JFileChooser archivo = new JFileChooser("C:\\Users\\Edu\\Desktop\\");
+			JFileChooser archivo = new JFileChooser("C:\\Users\\TEMP.Edu\\Desktop\\");
 			FileNameExtensionFilter filtro = new FileNameExtensionFilter("Archivos MSR", "msr");
 			archivo.setFileFilter(filtro);
 			archivo.showOpenDialog(archivo);

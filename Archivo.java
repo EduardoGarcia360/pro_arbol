@@ -173,10 +173,12 @@ public class Archivo {
 			archi.add(new Paragraph(saltodelinea));
 			archi.add(new Paragraph(saltodelinea));
 			archi.add(new Paragraph(saltodelinea));
-			//archi.add(new Paragraph("posicion de este texto 2"));
-			archi.add(new Paragraph(saltodelinea));
-			archi.add(new Paragraph(saltodelinea));
 			archi.add(imagen);
+			archi.add(new Paragraph(saltodelinea));
+			archi.add(new Paragraph(saltodelinea));
+			for(int h=0; h<paraFinal.size(); h++){
+				archi.add(new Paragraph(paraFinal.get(h).toString()));
+			}
 			archi.close();
 		} catch (FileNotFoundException e) {e.printStackTrace();}
 		  catch (DocumentException e) {e.printStackTrace();}
