@@ -1,7 +1,6 @@
 package Clases;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
@@ -15,6 +14,7 @@ public class Analizar {
 	public LinkedList<String> D1 = new LinkedList<String>();
 	public LinkedList<String> D2 = new LinkedList<String>();
 	public LinkedList<String> paraImprimir = new LinkedList<String>();
+	public LinkedList<String> paraImprimirFinal = new LinkedList<String>();
 	Archivo ar = new Archivo();
 	int contadorlexemas=0;
 	String LexemasdeCodigo="";
@@ -314,7 +314,7 @@ public class Analizar {
 						String[] contenido_paraImprimir = nuevo.split("%");
 						String condiciones = contenido_paraImprimir[1].substring(0, contenido_paraImprimir[1].length()-2);
 						
-						Imprimir(condiciones);
+						Imprimir(condiciones,"encabezado");
 					}
 				}else{
 					System.out.println("imagen o texto o .. incorrecto");
@@ -331,7 +331,7 @@ public class Analizar {
 		}
 	}
 	
-	private void Imprimir(String linea){
+	private void Imprimir(String linea, String ubicacion){
 		LinkedList<String> almacenar = new LinkedList<String>();
 		boolean fin = false;
 		int estado = 0, indice = 0;
@@ -850,7 +850,12 @@ public class Analizar {
 		for(int i=0; i<almacenar.size(); i++){
 			texto_actual += almacenar.get(i);
 		}
-		paraImprimir.add(texto_actual);
+		if(ubicacion.equals("encabezado")){
+			paraImprimir.add(texto_actual);
+		}else if(ubicacion.equals("variables")){
+			paraImprimirFinal.add(texto_actual);
+		}
+		
 		
 	}
 	
@@ -1256,7 +1261,7 @@ public class Analizar {
 		ar.CrearGRAPHVIZ(Agregando);
 		ar.crearHTML(LexemasdeCodigo);
 		try {
-			ar.CrearPDF();
+			ar.CrearPDF(paraImprimir, paraImprimirFinal);
 		} catch (IOException e) {
 			System.out.println("error no se encuentra la imagen");
 		} catch (DocumentException e) {

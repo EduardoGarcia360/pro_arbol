@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.util.LinkedList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -130,7 +131,7 @@ public class Archivo {
         }
 	}
 	
-	public void CrearPDF() throws IOException, DocumentException{
+	public void CrearPDF(LinkedList<String> paraEncabezado, LinkedList<String> paraFinal) throws IOException, DocumentException{
 		
 		try {
 			
@@ -141,7 +142,7 @@ public class Archivo {
 			
 			Membrete Imagen_Encabezado = new Membrete();
 			escritor.setPageEvent(Imagen_Encabezado);
-			Image imagen = Image.getInstance("C:\\Users\\Edu\\Desktop\\grafo1.png");
+			Image imagen = Image.getInstance("C:\\Users\\TEMP.Edu\\Desktop\\grafo1.png");
 			imagen.setAlignment(Element.ALIGN_CENTER);
 			archi.open();
 			Paragraph txt = new Paragraph(TEXTO);
@@ -201,10 +202,10 @@ public class Archivo {
 			System.out.println("error" + e);
 		}
 		
-		try{
-			String rutaDot = "C:\\E\\Progra\\Librerias_Externas\\release\\bin\\dot.exe";
-			String archivoGraphviz = "C:\\E\\Progra\\EclipseProjects\\ArbolGenealogico\\nuevo.gv";
-			String archivoImagen = "C:\\Users\\Edu\\Desktop\\grafo1.png";
+		try{//
+			String rutaDot = "E:\\e\\release\\bin\\dot.exe";
+			String archivoGraphviz = "E:\\e\\EclipseProjects\\ArbolGenealogico\\nuevo.gv";
+			String archivoImagen = "C:\\Users\\TEMP.Edu\\Desktop\\grafo1.png";
 			String tParam = "-Tpng";
 		    String tOParam = "-o";
 		    
