@@ -552,27 +552,43 @@ public class Analizar {
 								estado=2;
 							}
 						}else if(simbolo.equals("+")){
-							cantidad = cantidad + Integer.parseInt(lexema);
-							lexema="";
-							char siguiente = linea.charAt(indice+1);
-							if(siguiente == '"'){ //4+3+"ALGO"
-								String tmp = Integer.toString(cantidad);
-								almacenar.add(tmp);
-								cantidad=0;
-								simbolo="";
-								indice++;
-								estado=0;
-							}else if(Character.isDigit(siguiente)){ //4+3+2
-								simbolo = Character.toString(token);
+							/**
+							 * SI ES DIFERENTE A 0 QUIERE DECIR QUE YA TENEMOS ALGO PARA MULTIPLICAR
+							 * EJEMPLO: 5+10*23+2
+							 */
+							if(aux_multi != 0){
+								int multiplicando = aux_multi * Integer.parseInt(lexema);
+								cantidad = cantidad + multiplicando;
+								lexema="";
+								aux_multi=0;
+								simbolo="+";
 								indice++;
 								estado=2;
-							}else if(Character.isWhitespace(siguiente)){
-								indice++;
-								estado=0;
+								
 							}else{
-								almacenar.add("error");
-								estado=10;
+								cantidad = cantidad + Integer.parseInt(lexema);
+								lexema="";
+								char siguiente = linea.charAt(indice+1);
+								if(siguiente == '"'){ //4+3+"ALGO"
+									String tmp = Integer.toString(cantidad);
+									almacenar.add(tmp);
+									cantidad=0;
+									simbolo="";
+									indice++;
+									estado=0;
+								}else if(Character.isDigit(siguiente)){ //4+3+2
+									simbolo = Character.toString(token);
+									indice++;
+									estado=2;
+								}else if(Character.isWhitespace(siguiente)){
+									indice++;
+									estado=0;
+								}else{
+									almacenar.add("error");
+									estado=10;
+								}
 							}
+							
 						}else if(Character.isDigit(siguiente_caracter)){
 							simbolo = Character.toString(token);
 							/**
@@ -648,7 +664,7 @@ public class Analizar {
 								cantidad=0;
 								simbolo="";
 								estado=10;
-							}else{//SI NO TENEMOS NADA EN AUX_MULTI NO INGRESO ALGUNA MULTIPLICACION
+							}else{//SI NO TENEMOS NADA EN AUX_MULTI NO INGRESO ALGUNA MULTIPLICACION O YA LA EFECTUO
 								cantidad += (int) Integer.parseInt(lexema);
 								String tmp = Integer.toString(cantidad);
 								almacenar.add(tmp);
