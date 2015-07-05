@@ -798,11 +798,27 @@ public class Analizar {
 						
 					}else if(token == '*'){
 						if(!simbolo.equals("")){
+							/**
+							 * TENEMOS 5+2*8..
+							 */
 							if(simbolo.equals("+")){
-								aux_multi = Integer.parseInt(lexema);
-								lexema="";
-								indice++;
-								estado=2;
+								if(aux_multi != 0){
+									/**
+									 * VERIFICAMOS PRIMERO SI NO HAY OTRA MULTIPLICACION ANTES
+									 * EJEMPLO: 5+2*8 '*' 3..
+									 */
+									int multiplica = aux_multi * Integer.parseInt(lexema);
+									lexema="";
+									aux_multi = multiplica;
+									indice++;
+									estado=2;
+								}else{
+									aux_multi = Integer.parseInt(lexema);
+									lexema="";
+									indice++;
+									estado=2;
+								}
+								
 							}
 						}else{
 							/**
