@@ -339,7 +339,7 @@ public class Analizar {
 		linea += "#";
 		
 		String lexema="", base="", exponente="", numero="", simbolo="";
-		int cantidad=0;
+		int cantidad=0, aux_multi=0;
 		String Operando="";
 		try{
 			while(fin != true){
@@ -637,12 +637,26 @@ public class Analizar {
 						 * ENTONCES SUMAMOS LAS CANTIDADES
 						 */
 						if(simbolo.equals("+")){
-							cantidad += (int) Integer.parseInt(lexema);
-							String tmp = Integer.toString(cantidad);
-							almacenar.add(tmp);
-							lexema = "";
-							simbolo="";
-							estado = 10;
+							//SI YA TENEMOS ALGUN DATO EN AUX_MULTI ENTRA EN EL PRIMER IF
+							if(aux_multi != 0){
+								int multiplicacion = Integer.parseInt(lexema) * aux_multi;
+								cantidad = cantidad + multiplicacion;
+								String tmp = Integer.toString(cantidad);
+								almacenar.add(tmp);
+								lexema="";
+								aux_multi=0;
+								cantidad=0;
+								simbolo="";
+								estado=10;
+							}else{//SI NO TENEMOS NADA EN AUX_MULTI NO INGRESO ALGUNA MULTIPLICACION
+								cantidad += (int) Integer.parseInt(lexema);
+								String tmp = Integer.toString(cantidad);
+								almacenar.add(tmp);
+								lexema = "";
+								simbolo="";
+								estado = 10;
+							}
+							
 						}else if(simbolo.equals("-")){
 							cantidad = cantidad - Integer.parseInt(lexema);
 							String tmp = Integer.toString(cantidad);
@@ -767,25 +781,30 @@ public class Analizar {
 						}
 						
 					}else if(token == '*'){
-						/**
-						 * TENEMOS 10*2
-						 * HACEMOS
-						 * CANTIDAD = 10
-						 */
-						cantidad = Integer.parseInt(lexema);
-						simbolo = "*";
-						indice++;
-						lexema="";
-						estado=2;
+						if(!simbolo.equals("")){
+							if(simbolo.equals("+")){
+								aux_multi = Integer.parseInt(lexema);
+								lexema="";
+								indice++;
+								estado=2;
+							}
+						}else{
+							/**
+							 * TENEMOS 10*2
+							 * HACEMOS
+							 * CANTIDAD = 10
+							 */
+							cantidad = Integer.parseInt(lexema);
+							simbolo = "*";
+							indice++;
+							lexema="";
+							estado=2;
+						}
+						
 					}else{//FIN TOKEN SIMBOLO
 						//ERROR
 						estado = 10;
 					}
-					break;
-				case 3:
-					/**
-					 * CASE PARA PALABRA RESERVADA
-					 */
 					break;
 				case 10:
 					fin = true;
