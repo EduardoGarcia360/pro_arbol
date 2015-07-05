@@ -533,14 +533,24 @@ public class Analizar {
 						 */
 						
 						char siguiente_caracter = linea.charAt(indice+1);
+						
 						if(simbolo.equals("-")){
 							//6+50-4
 							cantidad = cantidad - Integer.parseInt(lexema);
 							lexema="";
-							simbolo = Character.toString(token);
-							indice++;
-							estado = 2;
-							
+							char siguiente = linea.charAt(indice+1);
+							if(siguiente == '"'){
+								String tmp = Integer.toString(cantidad);
+								almacenar.add(tmp);
+								cantidad=0;
+								indice++;
+								estado=0;
+								
+							}else if(Character.isDigit(siguiente)){
+								simbolo = Character.toString(token);
+								indice++;
+								estado=2;
+							}
 						}else if(simbolo.equals("+")){
 							cantidad = cantidad + Integer.parseInt(lexema);
 							lexema="";
@@ -563,8 +573,7 @@ public class Analizar {
 								almacenar.add("error");
 								estado=10;
 							}
-						}else
-						if(Character.isDigit(siguiente_caracter)){
+						}else if(Character.isDigit(siguiente_caracter)){
 							simbolo = Character.toString(token);
 							/**
 							 * SI EL SIGUIENTE DEL SIGNO '+' ES DIGITO
@@ -642,7 +651,12 @@ public class Analizar {
 							simbolo="";
 							estado=10;
 						}else if(simbolo.equals("*")){
-							
+							cantidad = cantidad * Integer.parseInt(lexema);
+							String tmp = Integer.toString(cantidad);
+							almacenar.add(tmp);
+							lexema="";
+							simbolo="";
+							estado=10;
 						}else if(simbolo.equals("/")){
 							
 						}else{
@@ -731,10 +745,11 @@ public class Analizar {
 						
 						char siguiente_caracter = linea.charAt(indice+1);
 						if(!simbolo.equals("")){
+							System.out.equals("entro en diferente a nada");
 							//VERIFICAMOS LO QUE TRAIAMOS ANTERIORMENTE
 							if(simbolo.equals("+")){ //EJEMPLO (2)
 								cantidad = cantidad + Integer.parseInt(lexema);
-								simbolo = Character.toString(token);
+								simbolo = "-";
 								lexema="";
 								indice++;
 								estado=2;
@@ -751,6 +766,17 @@ public class Analizar {
 							estado=2;
 						}
 						
+					}else if(token == '*'){
+						/**
+						 * TENEMOS 10*2
+						 * HACEMOS
+						 * CANTIDAD = 10
+						 */
+						cantidad = Integer.parseInt(lexema);
+						simbolo = "*";
+						indice++;
+						lexema="";
+						estado=2;
 					}else{//FIN TOKEN SIMBOLO
 						//ERROR
 						estado = 10;
