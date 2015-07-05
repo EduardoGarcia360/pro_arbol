@@ -338,7 +338,7 @@ public class Analizar {
 		char token;
 		linea += "#";
 		
-		String lexema="", base="", exponente="", numero="";
+		String lexema="", base="", exponente="", numero="", simbolo="";
 		int cantidad=0;
 		String Operando="";
 		try{
@@ -531,8 +531,41 @@ public class Analizar {
 						 * POR EJEMPLO VIENE ASI: ..3000+50
 						 * ACA ESTARIAMOS EN EL SIGNO '+' ACTUALMENTE
 						 */
+						
 						char siguiente_caracter = linea.charAt(indice+1);
+						if(simbolo.equals("-")){
+							//6+50-4
+							cantidad = cantidad - Integer.parseInt(lexema);
+							lexema="";
+							simbolo = Character.toString(token);
+							indice++;
+							estado = 2;
+							
+						}else if(simbolo.equals("+")){
+							cantidad = cantidad + Integer.parseInt(lexema);
+							lexema="";
+							char siguiente = linea.charAt(indice+1);
+							if(siguiente == '"'){ //4+3+"ALGO"
+								String tmp = Integer.toString(cantidad);
+								almacenar.add(tmp);
+								cantidad=0;
+								simbolo="";
+								indice++;
+								estado=0;
+							}else if(Character.isDigit(siguiente)){ //4+3+2
+								simbolo = Character.toString(token);
+								indice++;
+								estado=2;
+							}else if(Character.isWhitespace(siguiente)){
+								indice++;
+								estado=0;
+							}else{
+								almacenar.add("error");
+								estado=10;
+							}
+						}else
 						if(Character.isDigit(siguiente_caracter)){
+							simbolo = Character.toString(token);
 							/**
 							 * SI EL SIGUIENTE DEL SIGNO '+' ES DIGITO
 							 * EJEMPLO: 3000+50
@@ -590,14 +623,33 @@ public class Analizar {
 					}else if(token == '#'){
 						/**
 						 * LLEGO AL FINAL DE LA LINEA
-						 * EJEMPLO: 3000+50#
+						 * EJEMPLO (1): 3000+50#
+						 * EJEMPLO (2): 50-4#
 						 * ENTONCES SUMAMOS LAS CANTIDADES
 						 */
-						cantidad += (int) Integer.parseInt(lexema);
-						String tmp = Integer.toString(cantidad);
-						almacenar.add(tmp);
-						lexema = "";
-						estado = 10;
+						if(simbolo.equals("+")){
+							cantidad += (int) Integer.parseInt(lexema);
+							String tmp = Integer.toString(cantidad);
+							almacenar.add(tmp);
+							lexema = "";
+							simbolo="";
+							estado = 10;
+						}else if(simbolo.equals("-")){
+							cantidad = cantidad - Integer.parseInt(lexema);
+							String tmp = Integer.toString(cantidad);
+							almacenar.add(tmp);
+							lexema="";
+							simbolo="";
+							estado=10;
+						}else if(simbolo.equals("*")){
+							
+						}else if(simbolo.equals("/")){
+							
+						}else{
+							System.out.println("error");
+							estado = 10;
+						}
+						
 					}else if(token == ')'){ //-----------------------------------------CALCULAR RAIZ
 						
 						/**
@@ -665,29 +717,41 @@ public class Analizar {
 						estado=2;
 						lexema="";
 						
-					}else if(essimbolo(token)){
+					}else if(token == '-'){
+						System.out.println("entro en - estado 2");
 						/**
-						 * SI ES SIMBOLO ¿QUE SIMBOLO ES?
+						 * ACTUALMENTE ESTAMOS ACA .... '-'
+						 * PUEDE VENIR UNO DE LOS SIGUIENTES CASOS:
+						 * EJEMPLO (1):50-5
+						 * EJEMPLO (2):6+50-4
+						 * ERROR SERIA:
+						 * EJEMPLO (1): 50-+
+						 * EJEMPLO (2): 50-"ALGO"
 						 */
-						if(token == '-'){ //VA A RESTAR
-							/**
-							 * EJEMPLO: 50-4
-							 */
-							char siguiente_caracter = linea.charAt(indice+1);
-							if(Character.isDigit(siguiente_caracter)){
-								cantidad -= (int) Integer.parseInt(lexema);
+						
+						char siguiente_caracter = linea.charAt(indice+1);
+						if(!simbolo.equals("")){
+							//VERIFICAMOS LO QUE TRAIAMOS ANTERIORMENTE
+							if(simbolo.equals("+")){ //EJEMPLO (2)
+								cantidad = cantidad + Integer.parseInt(lexema);
+								simbolo = Character.toString(token);
 								lexema="";
 								indice++;
 								estado=2;
-							}else if(Character.isWhitespace(siguiente_caracter)){
-								indice++;
-								estado=0;
-							}else{
-								almacenar.add("error");
-								estado=10;
+							}else if(simbolo.equals("*")){
+								
+							}else if(simbolo.equals("/")){
+								
 							}
+						}else if(Character.isDigit(siguiente_caracter)){ // EJEMPLO (1)
+							simbolo = Character.toString(token);
+							cantidad = Integer.parseInt(lexema);
+							lexema="";
+							indice++;
+							estado=2;
 						}
-					}else{
+						
+					}else{//FIN TOKEN SIMBOLO
 						//ERROR
 						estado = 10;
 					}
