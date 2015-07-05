@@ -142,9 +142,12 @@ public class Archivo {
 			
 			Membrete Imagen_Encabezado = new Membrete();
 			escritor.setPageEvent(Imagen_Encabezado);
+			//IMAGEN DEL GRAFO
 			Image imagen = Image.getInstance("C:\\Users\\TEMP.Edu\\Desktop\\grafo1.png");
 			imagen.setAlignment(Element.ALIGN_CENTER);
 			archi.open();
+			
+			//TEXTO DEL ARCHIVO EN LA PARTE DE ENCABEZADO
 			Paragraph txt = new Paragraph(TEXTO);
 			if(NEGRITA.equals("ON")){
 				txt.getFont().setStyle(Font.BOLD);	
@@ -158,6 +161,9 @@ public class Archivo {
 			txt.getFont().setSize(25);
 			txt.setAlignment(Element.ALIGN_CENTER);
 			archi.add(txt);
+			for(int i=0; i<paraEncabezado.size(); i++){
+				archi.add(new Paragraph(paraEncabezado.get(i).toString()));
+			}
 			
 			archi.add(new Paragraph(saltodelinea));
 			archi.add(new Paragraph(saltodelinea));
