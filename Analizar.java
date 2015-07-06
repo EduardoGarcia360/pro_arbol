@@ -408,11 +408,9 @@ public class Analizar {
 						
 					}else if(Character.isLetter(token)){
 						//PARA VER SI ES LETRA
-						
-						indice++;
-						estado = 1;
-						lexema += Character.toString(token);
-						
+							indice++;
+							estado = 1;
+							lexema += Character.toString(token);
 						
 					}else if(token == '#'){
 						estado = 10;
@@ -688,6 +686,17 @@ public class Analizar {
 							simbolo="";
 							estado=10;
 						}else if(simbolo.equals("/")){
+							try{
+								cantidad = cantidad / Integer.parseInt(lexema);
+								String tmp = Integer.toString(cantidad);
+								almacenar.add(tmp);
+								lexema="";
+								simbolo="";
+								estado=10;
+							}catch(Exception e){
+								estado=10;
+							}
+							
 							
 						}else{
 							System.out.println("error");
@@ -707,10 +716,53 @@ public class Analizar {
 						 * EJEMPLO (3): SQRT(100)+"TEXTO"
 						 */
 						if(Operando.equals("sqrt")){
-							int cant = Integer.parseInt(lexema);
-							Double Raiz_Cuadrada = Math.sqrt(cant);
-							String almacenar_raiz = Double.toString(Raiz_Cuadrada);
-							almacenar.add(almacenar_raiz);
+							if(simbolo.equals("+")){
+								/**
+								 * SI TENEMOS SQRT(10+10)
+								 */
+								cantidad = cantidad + Integer.parseInt(lexema);
+								Double raiz = Math.sqrt(cantidad);
+								String tmp = Double.toString(raiz);
+								almacenar.add(tmp);
+								cantidad=0;
+								lexema="";
+								estado = 10;
+								
+							}else if(simbolo.equals("-")){
+								cantidad = cantidad - Integer.parseInt(lexema);
+								try{
+									Double raiz = Math.sqrt(cantidad);
+									String tmp = Double.toString(raiz);
+									almacenar.add(tmp);
+									estado = 10;
+								}catch(Exception e){
+									almacenar.add("error");
+									estado = 10;
+								}
+								
+							}else if(simbolo.equals("*")){
+								cantidad = cantidad * Integer.parseInt(lexema);
+								Double raiz = Math.sqrt(cantidad);
+								String tmp = Double.toString(raiz);
+								almacenar.add(tmp);
+								estado=10;
+							}else if(simbolo.equals("/")){
+								try{
+									cantidad = cantidad / Integer.parseInt(lexema);
+									Double raiz = Math.sqrt(cantidad);
+									String tmp = Double.toString(raiz);
+									almacenar.add(tmp);
+									estado=10;
+								}catch(Exception e){
+									estado=10;
+								}
+							}else{
+								int cant = Integer.parseInt(lexema);
+								Double Raiz_Cuadrada = Math.sqrt(cant);
+								String almacenar_raiz = Double.toString(Raiz_Cuadrada);
+								almacenar.add(almacenar_raiz);
+							}
+							
 							
 						}else if(Operando.equals("exp")){
 							exponente = lexema;
@@ -721,19 +773,60 @@ public class Analizar {
 							almacenar.add(almacenar_potencia);
 							
 						}else if(Operando.equals("fact")){
-							numero = lexema;
-							int cant_numero = Integer.parseInt(numero);
-							if(cant_numero == 1){
-								almacenar.add("1");
-							}else{
-								int fac=1;
-								for(int t=cant_numero; t>1; t--){
-									fac = fac * t;
+							/**
+							 * SI TENEMOS FACT(2+2)
+							 */
+							if(simbolo.equals("+")){
+								cantidad = cantidad + Integer.parseInt(lexema);
+								int fac=Factorial(cantidad);
+								String tmp = Integer.toString(fac);
+								almacenar.add(tmp);
+								cantidad =0;
+								lexema="";
+								estado=10;
+							}else if(simbolo.equals("-")){
+								try{
+									cantidad = cantidad - Integer.parseInt(lexema);
+									int fac=Factorial(cantidad);
+									String tmp = Integer.toString(fac);
+									almacenar.add(tmp);
+									cantidad=0;
+									lexema="";
+									estado=10;
+									
+								}catch(Exception e){
+									estado=10;
 								}
-								String almacenar_factorial = Integer.toString(fac);
-								almacenar.add(almacenar_factorial);
 								
+							}else if(simbolo.equals("*")){
+								cantidad = cantidad * Integer.parseInt(lexema);
+								int fac = Factorial(cantidad);
+								String tmp = Integer.toString(fac);
+								almacenar.add(tmp);
+								estado=10;
+							}else if(simbolo.equals("/")){
+								try{
+									cantidad = cantidad / Integer.parseInt(lexema);
+									int fac = Factorial(cantidad);
+									String tmp = Integer.toString(fac);
+									almacenar.add(tmp);
+									estado=10;
+								}catch(Exception e){
+									estado=10;
+								}
+							}else{
+								numero = lexema;
+								int cant_numero = Integer.parseInt(numero);
+								if(cant_numero == 1){
+									almacenar.add("1");
+								}else{
+									int fac=Factorial(cant_numero);
+									String almacenar_factorial = Integer.toString(fac);
+									almacenar.add(almacenar_factorial);
+									
+								}
 							}
+							
 						}
 						
 						char siguiente_caracter = linea.charAt(indice+1);
@@ -833,6 +926,13 @@ public class Analizar {
 							estado=2;
 						}
 						
+					}else if(token == '/'){
+						simbolo = "/";
+						cantidad=Integer.parseInt(lexema);
+						lexema="";
+						indice++;
+						estado=2;
+						
 					}else{//FIN TOKEN SIMBOLO
 						//ERROR
 						estado = 10;
@@ -859,8 +959,17 @@ public class Analizar {
 		
 	}
 	
+	private int Factorial(int cantidad){
+		int fac=1;
+		for(int t=cantidad; t>1; t--){
+			fac = fac * t;
+		}
+		return fac;
+	}
+	
 	private void LimpiarTodo(){
 		paraImprimir.clear();
+		paraImprimirFinal.clear();
 		L1.clear();
 		L3.clear();
 		D1.clear();
